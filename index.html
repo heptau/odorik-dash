@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Odorik Dash</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="navbar">
+		<div class="navbar-title">Přihlášení</div>
+		<button id="refreshCallsButton" title="Obnovit data hovorů" style="display: none;">🗘</button>
+	</div>
+	<div class="container">
+		<div id="loginSection">
+			<div>
+				<label for="apiUser">ID účtu:</label>
+				<input type="number" id="apiUser" pattern="[0-9]*">
+			</div>
+			<div>
+				<label for="apiPass">Heslo:</label>
+				<input type="password" id="apiPass">
+			</div>
+			<button id="loginButton">Přihlásit</button>
+			<div id="loginMessage"></div>
+		</div>
+
+		<div id="callsSection" style="display: none;">
+			<div id="tableContainer">
+				<table>
+					<thead>
+						<tr>
+							<th>Datum a čas</th>
+							<th>Volající</th>
+							<th>Volaný</th>
+							<th>Linka</th>
+							<th>Délka a cena</th>
+						</tr>
+					</thead>
+					<tbody id="callsTableBody"></tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,310 @@
+/* Reset a základní styl */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	background-color: #f5f5f5;
+	color: #000;
+	line-height: 1.5;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+	overflow: hidden; /* Zabrání posuvníku na body */
+}
+
+/* Navigační lišta */
+.navbar {
+	background-color: #fff;
+	padding: 12px 16px;
+	border-bottom: 1px solid #d1d1d1;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 20px;
+	font-weight: 600;
+	color: #000;
+}
+
+.navbar-title {
+	flex-grow: 1;
+	text-align: center;
+}
+
+/* Tlačítko aktualizace v záhlaví */
+#refreshCallsButton {
+	width: 32px;
+	height: 32px;
+	font-size: 20px;
+	 line-height: 1;
+	color: #000000; /* Černá ikona */
+	background-color: #fff; /* Stejná barva jako záhlaví */
+	border: 1px solid #d1d1d1; /* Jemná hranice */
+	border-radius: 10px; /* Zaoblené rohy pro iOS styl */
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background-color 0.2s, transform 0.1s;
+}
+
+#refreshCallsButton:hover {
+	background-color: #f7f7f7; /* Jemný šedý hover */
+}
+
+#refreshCallsButton:active {
+	transform: scale(0.98);
+}
+
+/* Kontejner */
+.container {
+	width: calc(100% - 10px); /* Maximální šířka */
+	margin: 5px auto;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	overflow: hidden; /* Zabrání posuvníku na kontejneru */
+}
+
+/* Přihlašovací sekce */
+#loginSection {
+	background-color: #fff;
+	border-radius: 16px;
+	padding: 20px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#loginSection div {
+	margin-bottom: 16px;
+}
+
+#loginSection label {
+	display: block;
+	font-size: 16px;
+	font-weight: 500;
+	margin-bottom: 8px;
+	color: #333;
+}
+
+#loginSection input {
+	width: 100%;
+	padding: 14px;
+	font-size: 16px;
+	border: 1px solid #d1d1d1;
+	border-radius: 10px;
+	background-color: #fafafa;
+	transition: border-color 0.2s;
+}
+
+#loginSection input:focus {
+	border-color: #007aff;
+	outline: none;
+}
+
+#loginSection button {
+	width: 100%;
+	padding: 14px;
+	font-size: 16px;
+	font-weight: 600;
+	color: #fff;
+	background-color: #007aff;
+	border: none;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: background-color 0.2s, transform 0.1s;
+}
+
+#loginSection button:hover {
+	background-color: #005bb5;
+}
+
+#loginSection button:active {
+	transform: scale(0.98);
+}
+
+#loginMessage {
+	margin-top: 12px;
+	font-size: 14px;
+	color: #d32f2f;
+	font-weight: 500;
+	text-align: center;
+	display: none;
+}
+
+/* Sekce s hovory */
+#callsSection {
+	background-color: #fff;
+	border-radius: 16px;
+	padding: 20px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Tabulka */
+#tableContainer {
+	height: calc(100vh - 70px); /* Odečte navbar a marginy */
+	overflow-y: auto;
+	overflow-x: auto;
+	border-radius: 10px;
+	background-color: #fff;
+	scroll-behavior: smooth;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 14px;
+	table-layout: fixed; /* Fixní rozložení sloupců */
+}
+
+thead {
+	position: sticky;
+	top: 0;
+	background-color: #f7f7f7;
+	z-index: 10;
+	border-bottom: 1px solid #d1d1d1;
+}
+
+th, td {
+	padding: 16px 8px;
+	text-align: left;
+	border-bottom: 1px solid #e0e0e0;
+	word-wrap: break-word; /* Zalamování dlouhých textů */
+}
+
+/* Explicitní šířky sloupců */
+th:nth-child(1), td:nth-child(1) { width: 20%; min-width: 100px; } /* Datum a čas */
+th:nth-child(2), td:nth-child(2) { width: 25%; min-width: 120px; } /* Volající */
+th:nth-child(3), td:nth-child(3) { width: 25%; min-width: 120px; } /* Volaný */
+th:nth-child(4), td:nth-child(4) { width: 15%; min-width: 80px; } /* Linka */
+th:nth-child(5), td:nth-child(5) { width: 15%; min-width: 80px; } /* Délka a cena */
+
+th {
+	font-weight: 600;
+	color: #000;
+}
+
+/* Střídání barev řádků */
+tr:nth-child(even) {
+	background-color: #f9f9f9;
+}
+
+/* Formátování buněk */
+.date-cell, .phone-cell, .duration-price-cell, .line-cell {
+	line-height: 1.4;
+}
+
+.date-cell span:nth-child(2),
+.phone-cell span:nth-child(2),
+.line-cell span:nth-child(2),
+.duration-price-cell span:nth-child(2) {
+	display: block;
+	margin-top: 4px;
+	font-size: 12px;
+}
+
+.phone-cell span:nth-child(2) {
+	color: #666;
+	font-style: italic; /* Kurzíva pro název státu */
+}
+
+.line-cell span:nth-child(2) {
+	color: #666; /* Šedá pro In/Out */
+}
+
+.duration-price-cell span {
+	white-space: nowrap; /* Zabrání zalomení ceny */
+}
+
+.price-decimal-second {
+	color: #666 !important; /* Šedá pro poslední dvě desetinná místa */
+}
+
+/* Responzivní design */
+@media (max-width: 1024px) { /* Tablety (např. iPad) */
+	.container {
+		width: calc(100% - 8px);
+		margin: 4px auto;
+	}
+
+	#tableContainer {
+		height: calc(100vh - 65px);
+	}
+
+	table {
+		font-size: 13px;
+	}
+
+	th, td {
+		padding: 12px 6px;
+	}
+
+	/* Úprava šířek sloupců pro tablety */
+	th:nth-child(1), td:nth-child(1) { min-width: 90px; }
+	th:nth-child(2), td:nth-child(2) { min-width: 110px; }
+	th:nth-child(3), td:nth-child(3) { min-width: 110px; }
+	th:nth-child(4), td:nth-child(4) { min-width: 70px; }
+	th:nth-child(5), td:nth-child(5) { min-width: 70px; }
+}
+
+@media (max-width: 600px) { /* Telefony */
+	.container {
+		width: calc(100% - 6px);
+		margin: 3px auto;
+		padding: 0 3px;
+	}
+
+	#loginSection, #callsSection {
+		padding: 12px;
+		border-radius: 12px;
+	}
+
+	#loginSection input, #loginSection button {
+		padding: 12px;
+		font-size: 15px;
+	}
+
+	#refreshCallsButton {
+		width: 30px;
+		height: 30px;
+		font-size: 18px;
+		border-radius: 9px;
+	}
+
+	#tableContainer {
+		height: calc(100vh - 60px);
+	}
+
+	table {
+		font-size: 12px;
+	}
+
+	th, td {
+		padding: 10px 4px;
+	}
+
+	/* Úprava šířek sloupců pro telefony */
+	th:nth-child(1), td:nth-child(1) { min-width: 80px; }
+	th:nth-child(2), td:nth-child(2) { min-width: 100px; }
+	th:nth-child(3), td:nth-child(3) { min-width: 100px; }
+	th:nth-child(4), td:nth-child(4) { min-width: 60px; }
+	th:nth-child(5), td:nth-child(5) { min-width: 60px; }
+}
+
+/* Všechny number inputy - skryje šipky ve Firefoxu, Chrome, Edge atd. */
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none; /* Chrome, Safari, Edge */
+  margin: 0; /* Některé prohlížeče přidávají margin */
+}
