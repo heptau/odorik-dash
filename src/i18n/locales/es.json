@@ -37,7 +37,14 @@
     "clear_cache_confirm": "¿Realmente desea borrar la caché?",
     "about": "Acerca de",
     "version": "Odorik Dash",
-    "aboutText": "Gestión de contactos, llamadas y SMS para Odorik.cz"
+    "aboutText": "Gestión de contactos, llamadas y SMS para Odorik.cz",
+    "update_check": "Buscar actualizaciones",
+    "update_checking": "Verificando...",
+    "update_available": "Actualización disponible",
+    "update_latest": "Tienes la última versión",
+    "update_error": "Error al buscar actualizaciones",
+    "check_update": "Verificar",
+    "update_now": "Actualizar"
   },
   "common": {
     "retry": "Reintentar"

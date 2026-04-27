@@ -12,7 +12,14 @@
     "reloadApp": "Neu laden", "cache": "Cache", "clear_cache": "Cache löschen",
     "clear_cache_desc": "Löscht gespeicherte Daten (Verlauf, Kontakte), bleibt aber angemeldet.",
     "clear_cache_confirm": "Möchten Sie den Cache wirklich löschen?", "about": "Über",
-    "version": "Odorik Dash", "aboutText": "Verwaltung von Kontakten, Anrufen und SMS für Odorik.cz"
+    "version": "Odorik Dash", "aboutText": "Verwaltung von Kontakten, Anrufen und SMS für Odorik.cz",
+    "update_check": "Nach Updates suchen",
+    "update_checking": "Prüfe...",
+    "update_available": "Update verfügbar",
+    "update_latest": "Sie haben die neueste Version",
+    "update_error": "Update-Prüfung fehlgeschlagen",
+    "check_update": "Prüfen",
+    "update_now": "Jetzt aktualisieren"
   },
   "common": { "retry": "Erneut versuchen" },
   "contacts": {

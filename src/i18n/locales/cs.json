@@ -37,7 +37,14 @@
     "clear_cache_confirm": "Opravdu smazat cache?",
     "about": "O aplikaci",
     "version": "Odorik Dash",
-    "aboutText": "Správa kontaktů, hovorů a SMS pro Odorik.cz"
+    "aboutText": "Správa kontaktů, hovorů a SMS pro Odorik.cz",
+    "update_check": "Zkontrolovat aktualizace",
+    "update_checking": "Kontroluji...",
+    "update_available": "Aktualizace dostupná",
+    "update_latest": "Máte nejnovější verzi",
+    "update_error": "Nepodařilo se zkontrolovat aktualizace",
+    "check_update": "Zkontrolovat",
+    "update_now": "Aktualizovat"
   },
   "common": {
     "retry": "Zkusit znovu"

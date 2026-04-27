@@ -12,7 +12,7 @@
     "reloadApp": "Recharger", "cache": "Cache", "clear_cache": "Effacer le cache",
     "clear_cache_desc": "Efface les données stockées (historique, contacts), mais reste connecté.",
     "clear_cache_confirm": "Voulez-vous vraiment effacer le cache?", "about": "À propos",
-    "version": "Odorik Dash", "aboutText": "Gestion des contacts, appels et SMS pour Odorik.cz"
+    "version": "Odorik Dash", "aboutText": "Gestion des contacts, appels et SMS pour Odorik.cz", "update_check": "Vérifier les mises à jour", "update_checking": "Vérification...", "update_available": "Mise à jour disponible", "update_latest": "Vous avez la dernière version", "update_error": "Échec de la vérification", "check_update": "Vérifier", "update_now": "Mettre à jour"
   },
   "common": { "retry": "Réessayer" },
   "contacts": {

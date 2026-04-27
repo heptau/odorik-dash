@@ -37,7 +37,14 @@
     "clear_cache_confirm": "Are you sure you want to clear cache?",
     "about": "About",
     "version": "Odorik Dash",
-    "aboutText": "Contacts, calls and SMS management for Odorik.cz"
+    "aboutText": "Contacts, calls and SMS management for Odorik.cz",
+    "update_check": "Check for updates",
+    "update_checking": "Checking...",
+    "update_available": "Update available",
+    "update_latest": "You have the latest version",
+    "update_error": "Failed to check for updates",
+    "check_update": "Check",
+    "update_now": "Update Now"
   },
   "common": {
     "retry": "Try again"
