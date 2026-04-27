@@ -1,5 +1,5 @@
 {
-  "app": { "name": "Odorik" },
+  "app": { "name": "Odorik Dash" },
   "nav": {
     "contacts": "Liên hệ", "calls": "Lịch sử cuộc gọi", "sms_received": "SMS đã nhận", "sms_sent": "SMS đã gửi",
     "new_sms": "SMS", "more": "Thêm", "lines": "Đường dây", "sim_cards": "Thẻ SIM", "callback": "Gọi lại",
@@ -76,7 +76,7 @@
     "top_lines": "Đường dây hoạt động nhiều nhất", "no_data": "Không có dữ liệu."
   },
   "login": {
-    "title": "Odorik.cz", "subtitle": "Đăng nhập bằng tên và mật khẩu API (hoặc SIP).",
+    "title": "Odorik Dash", "subtitle": "Đăng nhập bằng tên và mật khẩu API (hoặc SIP).",
     "username": "Tên API / SIP", "password": "Mật khẩu", "submit": "Đăng nhập"
   },
   "common": {

@@ -1,4 +1,5 @@
-const CACHE_NAME = 'odorik-dash-v1';
+const CACHE_VERSION = '1.0.0';
+const CACHE_NAME = `odorik-dash-v${CACHE_VERSION}`;
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -23,9 +24,14 @@ self.addEventListener('activate', (event) => {
           .filter((name) => name !== CACHE_NAME)
           .map((name) => caches.delete(name))
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('fetch', (event) => {
@@ -68,4 +74,10 @@ self.addEventListener('fetch', (event) => {
       });
     })
   );
+});
+
+self.addEventListener('controllerchange', (event) => {
+  if (event.controller) {
+    window.location.reload();
+  }
 });

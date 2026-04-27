@@ -1,59 +1,76 @@
 # Contributing to Odorik Dash
 
-## Development Workflow
+## Development Setup
 
-1. **Fork and clone**
-2. Create feature branch: `git checkout -b feature/my-feature`
-3. Make commits: `git commit -m "feat: description"`
-4. Push: `git push origin feature/my-feature`
-5. Open Pull Request
-
-## Code Conventions
-
-### Git commits
-```
-feat: add new feature
-fix: fix bug
-docs: documentation
-style: formatting (no logic changes)
-refactor: refactoring
-test: tests
-chore: build, deps, etc.
-```
-
-### TypeScript
-- ✅ No `any` - always define types
-- ✅ `strict: true` in tsconfig.json
-- ✅ Naming: `camelCase` for variables/functions, `PascalCase` for components
-
-### React Components
-- Functional components with hooks
-- Prop types in TypeScript interface
-- Each component in separate file
-- JSDoc comments for public components
-
-### Tailwind CSS
-- Mobile-first responsive design
-- No inline styles
-- Reusable classes in `@apply` if repeated
-
-### Tests
 ```bash
-npm test              # Run tests
-npm run coverage      # Coverage report
+# Clone the repository
+git clone https://github.com/your-repo/odorik-dash.git
+cd odorik-dash
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Run tests
+npm run test
+
+# Build for production
+npm run build
 ```
 
-## Release Workflow
+## Code Style
 
-1. Update `package.json` version (semver)
-2. Update CHANGELOG
-3. Tag: `git tag v1.2.3`
-4. Push: `git push origin main --tags`
-5. GitHub Actions deploy to GitHub Pages
+This project uses **EditorConfig** to maintain consistent code formatting. Please ensure your editor has EditorConfig support enabled.
 
-## API Communication
+### EditorConfig Settings
 
-- All API calls go through `src/services/odorikApi.ts`
-- Always error handling
-- 30s timeout
-- Retry logic for critical requests
+The `.editorconfig` file defines:
+- **Indentation**: Tabs (3 spaces per tab)
+- **Line endings**: LF (Unix-style)
+- **Charset**: UTF-8
+- **Trim trailing whitespace**: Yes
+- **Insert final newline**: Yes
+
+### VS Code Setup
+
+If you use VS Code, install the [EditorConfig extension](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig) to automatically apply these settings.
+
+### Other Editors
+
+- **IntelliJ IDEA / WebStorm**: Native support (Settings → Editor → Code Style → Enable EditorConfig)
+- **Sublime Text**: Install [EditorConfig](https://github.com/sindresorhus/EditorConfig) package
+- **Atom**: Install [editorconfig](https://github.com/sindresorhus/atom-editorconfig) package
+
+## Commit Messages
+
+- Use English for all commit messages
+- Keep messages concise and descriptive
+- Start with a verb in imperative mood (e.g., "Add feature", "Fix bug", "Update documentation")
+
+## Pull Requests
+
+1. Create a branch from `main`
+2. Make your changes
+3. Run tests: `npm run test`
+4. Run linting: `npm run lint`
+5. Build: `npm run build`
+6. Submit a pull request
+
+## Testing
+
+Run tests before submitting:
+
+```bash
+npm run test        # Run all tests
+npm run test:watch  # Run tests in watch mode
+```
+
+## Building
+
+```bash
+npm run build
+```
+
+The build output is in `docs/` directory, ready for GitHub Pages deployment.

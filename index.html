@@ -3,13 +3,34 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, shrink-to-fit=no, viewport-fit=cover" />
-		<meta name="apple-mobile-web-app-title" content="Odorik">
+		<meta name="description" content="Contacts, calls and SMS management for Odorik.cz. Manage your phone lines, contacts, call history and SMS messages.">
+		<meta name="keywords" content="Odorik, phone, SMS, calls, contacts, VoIP, mobile, Czech">
+		<meta name="author" content="Odorik Dash">
+		<meta name="robots" content="index, follow">
+		
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website">
+		<meta property="og:title" content="Odorik Dash">
+		<meta property="og:description" content="Contacts, calls and SMS management for Odorik.cz">
+		<meta property="og:image" content="/odorik-icon.svg">
+		<meta property="og:url" content="https://odorik-dash.80.cz/">
+		
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary">
+		<meta name="twitter:title" content="Odorik Dash">
+		<meta name="twitter:description" content="Contacts, calls and SMS management for Odorik.cz">
+		<meta name="twitter:image" content="/odorik-icon.svg">
+		
+		<!-- PWA -->
+		<meta name="apple-mobile-web-app-title" content="Odorik Dash">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 		<meta name="theme-color" content="#3b82f6">
 		<link rel="manifest" href="/app.webmanifest">
 		<link rel="icon" type="image/svg+xml" href="/odorik-icon.svg">
 		<link rel="apple-touch-icon" href="/odorik-icon.svg">
+		<link rel="canonical" href="https://odorik-dash.80.cz/">
+		
 		<title>Odorik Dash</title>
 	</head>
 	<body>
@@ -17,9 +38,22 @@
 		<script type="module" src="/src/main.tsx"></script>
 		<script>
 			if ('serviceWorker' in navigator) {
+				let newWorker = null;
 				window.addEventListener('load', () => {
 					navigator.serviceWorker.register('/sw.js').then((registration) => {
 						console.log('SW registered:', registration);
+						
+						registration.addEventListener('updatefound', () => {
+							newWorker = registration.installing;
+							newWorker.addEventListener('statechange', () => {
+								if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+									if (confirm('New version available. Reload to update?')) {
+										newWorker.postMessage({ type: 'SKIP_WAITING' });
+										window.location.reload();
+									}
+								}
+							});
+						});
 					}).catch((error) => {
 						console.log('SW registration failed:', error);
 					});

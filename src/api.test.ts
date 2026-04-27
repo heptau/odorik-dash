@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { splitPhoneNo, unifyPhoneNo, parseContactName, lookupContact } from './api';
+import { splitPhoneNo, unifyPhoneNo, parseContactName, lookupContact, isInternalPhone, lookupLineByNumber, lookupLineById, lookupContactOrLine } from './api';
 
 describe('splitPhoneNo', () => {
   it('should split Czech phone number with +420 prefix', () => {
@@ -113,6 +113,90 @@ describe('lookupContact', () => {
 
   it('should return undefined for short numbers', () => {
     const result = lookupContact('123', contacts);
+    expect(result).toBeUndefined();
+  });
+});
+
+describe('isInternalPhone', () => {
+  it('should return true for numbers starting with *', () => {
+    expect(isInternalPhone('*123')).toBe(true);
+    expect(isInternalPhone('*100')).toBe(true);
+  });
+
+  it('should return true for numbers starting with #', () => {
+    expect(isInternalPhone('#123')).toBe(true);
+  });
+
+  it('should return false for regular phone numbers', () => {
+    expect(isInternalPhone('+420777123456')).toBe(false);
+    expect(isInternalPhone('777123456')).toBe(false);
+  });
+
+  it('should return false for empty string', () => {
+    expect(isInternalPhone('')).toBe(false);
+  });
+});
+
+describe('lookupLineByNumber', () => {
+  const lines = [
+    { id: '1', caller_id: '+420777111222', name: 'Line 1' },
+    { id: '2', caller_id: '+420777333444', name: 'Line 2' },
+    { id: '3', caller_id: '*111', name: 'Internal' },
+  ];
+
+  it('should find line by full number with + prefix', () => {
+    const result = lookupLineByNumber('+420777111222', lines as any);
+    expect(result).toEqual(lines[0]);
+  });
+
+  it('should return undefined for non-existent number', () => {
+    const result = lookupLineByNumber('+420999999999', lines as any);
+    expect(result).toBeUndefined();
+  });
+
+  it('should return undefined for short numbers', () => {
+    const result = lookupLineByNumber('123', lines as any);
+    expect(result).toBeUndefined();
+  });
+});
+
+describe('lookupLineById', () => {
+  const lines = [
+    { id: '1', number: '+420777111222', name: 'Line 1' },
+    { id: '2', number: '+420777333444', name: 'Line 2' },
+  ];
+
+  it('should find line by string id', () => {
+    const result = lookupLineById('1', lines as any);
+    expect(result).toEqual(lines[0]);
+  });
+
+  it('should find line by number id', () => {
+    const result = lookupLineById(2, lines as any);
+    expect(result).toEqual(lines[1]);
+  });
+
+  it('should return undefined for non-existent id', () => {
+    const result = lookupLineById('999', lines as any);
+    expect(result).toBeUndefined();
+  });
+});
+
+describe('lookupContactOrLine', () => {
+  const contacts = [
+    { shortcut: 1, number: '+420777123456', name: 'Contact 1' },
+  ] as any;
+  const lines = [
+    { id: '1', caller_id: '+420777111222', name: 'Line 1' },
+  ] as any;
+
+  it('should find contact by phone number', () => {
+    const result = lookupContactOrLine('+420777123456', contacts, lines);
+    expect(result?.type).toBe('contact');
+  });
+
+  it('should return undefined for non-existent number', () => {
+    const result = lookupContactOrLine('+420999999999', contacts, lines);
     expect(result).toBeUndefined();
   });
 });

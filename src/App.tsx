@@ -4,15 +4,16 @@ import SendSms from './components/SendSms';
 import Callback from './components/Callback';
 import Lines from './components/Lines';
 import Login from './components/Login';
-import Settings from './components/Settings';
 import ActiveCalls from './components/ActiveCalls';
 import Activity from './components/Activity';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { SkeletonList } from './components/Skeleton';
+import PullToRefresh from './components/PullToRefresh';
 import { useBalance, useContacts, useActiveCalls, useActivity, useLines } from './hooks';
 import { useT } from './i18n';
 
 const Statistics = lazy(() => import('./components/Statistics').then(m => ({ default: m.default })));
+const SettingsLazy = lazy(() => import('./components/Settings').then(m => ({ default: m.default })));
 import { loadCredentials, clearCredentials, clearAllCaches } from './api';
 import type { OdorikCredentials } from './api';
 
@@ -114,7 +115,11 @@ function App() {
 					<Statistics creds={creds} />
 				</Suspense>
 			)}
-			{activeTab === 'settings' && <Settings onClearCache={handleClearCache} />}
+			{activeTab === 'settings' && (
+				<Suspense fallback={<div className="p-4"><SkeletonList count={5} /></div>}>
+					<SettingsLazy onClearCache={handleClearCache} />
+				</Suspense>
+			)}
 		</ErrorBoundary>
 	);
 
@@ -200,7 +205,7 @@ function App() {
 					<div className="w-8 h-8 rounded-xl flex items-center justify-center shadow-lg" style={{ backgroundColor: 'var(--accent)', boxShadow: '0 4px 12px var(--shadow)' }}>
 						<svg className="w-5 h-5" style={{ color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
 					</div>
-					<h1 className="text-xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>Odorik</h1>
+					<h1 className="text-lg font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>Odorik Dash</h1>
 				</div>
 
 				<div className="flex flex-col items-end">
@@ -212,7 +217,7 @@ function App() {
 							onClick={() => refreshBalance(true)}
 							disabled={balanceLoading}
 							className="p-1 disabled:opacity-30"
-							title={t('balance.refresh')}
+							aria-label={t('balance.refresh')}
 						>
 							<svg className={`w-3.5 h-3.5 ${balanceLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
 						</button>
@@ -222,10 +227,12 @@ function App() {
 			</header>
 
 			{/* MAIN CONTENT AREA */}
-			<main className="flex-1 p-4 md:p-8 md:p-12 mb-16 md:mb-0">
-				<div className="max-w-6xl mx-auto">
-					{renderContent()}
-				</div>
+			<main className="flex-1 p-4 md:p-8 md:p-12 mb-16 md:mb-0 md:overflow-auto">
+				<PullToRefresh onRefresh={async () => window.location.reload()}>
+					<div className="max-w-6xl mx-auto">
+						{renderContent()}
+					</div>
+				</PullToRefresh>
 			</main>
 
 			{/* MOBILE BOTTOM NAVIGATION */}
@@ -251,7 +258,7 @@ function App() {
 								</button>
 							))}
 							{hiddenItems.length > 0 && (
-								<button onClick={() => setShowMoreMenu(true)} className={`flex-1 py-1.5 flex flex-col items-center justify-center transition-opacity`} style={{ color: 'var(--text-tertiary)' }}>
+								<button onClick={() => setShowMoreMenu(true)} aria-label={t('nav.more')} className={`flex-1 py-1.5 flex flex-col items-center justify-center transition-opacity`} style={{ color: 'var(--text-tertiary)' }}>
 									<svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
 									<span className="text-[9px] font-medium leading-none">{t('nav.more')}</span>
 								</button>

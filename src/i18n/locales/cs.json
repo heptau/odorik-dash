@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Odorik"
+    "name": "Odorik Dash"
   },
   "nav": {
     "contacts": "Kontakty",
@@ -183,7 +183,7 @@
     "no_data": "K dispozici nejsou žádná data."
   },
   "login": {
-    "title": "Odorik.cz",
+    "title": "Odorik Dash",
     "subtitle": "Přihlaste se pomocí API jména a hesla (nebo SIP jména a hesla).",
     "username": "API / SIP Jméno",
     "password": "Heslo",

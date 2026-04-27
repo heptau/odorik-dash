@@ -12,15 +12,16 @@ Odorik Dash is a modernization of the original PWA app. Built on React 19 + Type
 - **Testing**: Vitest + @testing-library/react + jsdom (32 tests)
 - **Code Quality**: ESLint + TypeScript strict mode
 - **APIs**: Odorik.cz REST API (documentation in openapi.yaml)
-- **PWA**: Service Worker + Web App Manifest
+- **PWA**: Service Worker + Web App Manifest (offline support)
 
 ## Directory Structure
 ```
 src/
 ├── components/        # React components (Contacts, Calls, Sms, Activity, ...)
 ├── hooks/             # Custom React hooks (useBalance, useContacts, useActivity, ...)
-├── i18n/              # Internationalization (cs, en)
-│   └── locales/       # EDIT LOCALIZATIONS HERE
+├── i18n/              # Internationalization (11 languages)
+│   └── locales/       # EDIT LOCALIZATIONS HERE (cs, en, de, es, fr, it, pl, pt, sk, uk, vi)
+├── pwa/               # PWA files (manifest, icon, service worker)
 ├── test/              # Test setup
 ├── api.ts             # API functions + types (OdorikCall, OdorikSMS, ...)
 ├── App.tsx            # Root component with tab navigation
@@ -30,15 +31,24 @@ docs/                  # Build output for GitHub Pages
 ├── index.html         # Built HTML
 ├── assets/            # Built JS/CSS
 ├── locales/           # Copied from src/i18n/locales/
+├── app.webmanifest    # PWA manifest
+├── sw.js              # Service Worker
+├── odorik-icon.svg    # App icon
 └── CNAME              # Custom domain (keep in git!)
 ```
 ```
 
 ## ⚠️ IMPORTANT: Localization (i18n)
-- **Source localization**: `src/i18n/locales/cs.json` and `en.json`
-- **Build automatically copies** to `public/locales/` and `dist/locales/`
-- **NEVER EDIT files in `public/locales/`** - they will be overwritten on build
+- **Source localization**: `src/i18n/locales/*.json` (11 languages: cs, en, de, es, fr, it, pl, pt, sk, uk, vi)
+- **Build automatically copies** to `docs/locales/`
+- **NEVER EDIT files in `docs/locales/`** - they will be overwritten on build
 - When editing localization, always edit files in `src/i18n/locales/`
+
+### Language Picker (iOS-style)
+- Settings language picker is split into **Suggested** and **Other** sections
+- **Suggested**: Auto (first) + system-preferred languages in system order
+- **Other**: Remaining languages in alphabetical order
+- Uses `navigator.languages` to detect system preferences
 
 ## Key Features (Status)
 - ✅ Authentication (SIP/API credentials, encrypted with AES-GCM)
@@ -51,7 +61,7 @@ docs/                  # Build output for GitHub Pages
 - ✅ SIM card management (data usage, packages)
 - ✅ Callback
 - ✅ PWA support (offline, installable)
-- ✅ i18n (cs/en, auto-detection)
+- ✅ i18n (11 languages with auto-detection)
 - ✅ Logout with cache clearing (Settings → Logout)
 
 ## API Integration
@@ -111,6 +121,7 @@ clearAllCaches(): Promise<void>                   // Clear all cache
 7. **Build**: `npm run build` or `make build`
 8. **API Documentation**: If `openapi.yaml` doesn't match actual API behavior, fix it automatically without asking.
 9. **Commits**: Never commit automatically - only when explicitly requested by user.
+10. **Code Formatting**: Use `.editorconfig` - enables EditorConfig support in your IDE (VS Code: EditorConfig extension, IntelliJ: native support)
 
 ## Testing
 - **Framework**: Vitest + @testing-library/react

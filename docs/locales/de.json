@@ -1,5 +1,5 @@
 {
-  "app": { "name": "Odorik" },
+  "app": { "name": "Odorik Dash" },
   "nav": {
     "contacts": "Kontakte", "calls": "Anrufverlauf", "sms_received": "Empfangene SMS", "sms_sent": "Gesendete SMS",
     "new_sms": "SMS", "more": "Mehr", "lines": "Linien", "sim_cards": "SIM-Karten", "callback": "Callback",
@@ -75,7 +75,7 @@
     "top_lines": "Aktivste Linien", "no_data": "Keine Daten verfügbar."
   },
   "login": {
-    "title": "Odorik.cz", "subtitle": "Melden Sie sich mit API-Benutzername und Passwort (oder SIP) an.",
+    "title": "Odorik Dash", "subtitle": "Melden Sie sich mit API-Benutzername und Passwort (oder SIP) an.",
     "username": "API / SIP-Benutzername", "password": "Passwort", "submit": "Anmelden"
   },
   "common": {

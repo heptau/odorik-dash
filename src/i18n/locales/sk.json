@@ -1,5 +1,5 @@
 {
-  "app": { "name": "Odorik" },
+  "app": { "name": "Odorik Dash" },
   "nav": {
     "contacts": "Kontakty", "calls": "História hovorov", "sms_received": "Prijaté SMS", "sms_sent": "Odoslané SMS",
     "new_sms": "SMS", "more": "Viac", "lines": "Linky", "sim_cards": "SIM karty", "callback": "Callback",
@@ -75,7 +75,7 @@
     "top_lines": "Najaktívnejšie linky", "no_data": "K dispozícii nie sú žiadne dáta."
   },
   "login": {
-    "title": "Odorik.cz", "subtitle": "Prihláste sa pomocou API mena a hesla (alebo SIP mena a hesla).",
+    "title": "Odorik Dash", "subtitle": "Prihláste sa pomocou API mena a hesla (alebo SIP mena a hesla).",
     "username": "API / SIP Meno", "password": "Heslo", "submit": "Prihlásiť sa"
   },
   "common": {
