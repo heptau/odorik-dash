@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { fetchContacts, addContact, editContact, deleteContact, unifyPhoneNo, parseContactName } from '../api';
 import type { Contact, OdorikCredentials } from '../api';
 import ContactModal from './ContactModal';
@@ -386,95 +387,57 @@ export default function Contacts({ creds, setTab }: { creds: OdorikCredentials; 
         })}
       </div>
 
-      {/* Action Sheet */}
-      {activeActionSheet && (
-        <div className="fixed inset-0 z-[60] flex flex-col justify-end">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setActiveActionSheet(null)} />
-<div className="relative rounded-t-3xl shadow-2xl p-4 pb-[calc(env(safe-area-inset-bottom)+16px)] animate-in slide-in-from-bottom-full duration-200" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-             
-             <div className="w-1.5 rounded-full mx-auto mb-4" style={{ backgroundColor: 'var(--separator)' }} />
-             
-             <div className="text-center mb-4 px-4">
-               <h3 className="font-bold text-xl truncate" style={{ color: 'var(--text-primary)' }}>{parseContactName(activeActionSheet.name).name}</h3>
-               <p className="font-medium" style={{ color: 'var(--text-secondary)' }}>{unifyPhoneNo(activeActionSheet.number)}</p>
-             </div>
-
-<div className="rounded-2xl overflow-hidden mb-4 shadow-sm" style={{ backgroundColor: 'var(--surface)' }}>
-                  {/* Callback Button */}
-                  <button
-                    onClick={() => {
-                      localStorage.setItem('callback_recipient', activeActionSheet.number);
-                      if (setTab) setTab('callback');
-                      setActiveActionSheet(null);
-                    }}
-                    className="w-full flex items-center gap-4 px-4 py-4 text-left transition-colors"
-                    style={{ backgroundColor: 'var(--surface)' }}
-                  >
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(249, 115, 22, 0.1)', color: 'rgba(249, 115, 22, 1)' }}>
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                    </div>
-                    <div className="flex-1 text-center">
-                      <div className="font-bold" style={{ color: 'var(--text-primary)' }}>{t('contacts.callback')}</div>
-                      <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('contacts.callbackDesc')}</div>
-                    </div>
-                    <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-tertiary)' }}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-                  </button>
-
-                  <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
-
-                  {/* Send SMS Button */}
-                  <button
-                    onClick={() => {
-                      localStorage.setItem('sms_recipient', activeActionSheet.number);
-                      if (setTab) setTab('send_sms');
-                      setActiveActionSheet(null);
-                    }}
-                    className="w-full flex items-center gap-4 px-4 py-4 text-left transition-colors"
-                    style={{ backgroundColor: 'var(--surface)' }}
-                  >
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', color: 'var(--accent)' }}>
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                    </div>
-                    <div className="flex-1 text-center">
-                      <div className="font-bold" style={{ color: 'var(--text-primary)' }}>{t('contacts.sendSms')}</div>
-                      <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('contacts.sendSmsDesc')}</div>
-                    </div>
-                    <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-tertiary)' }}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-                  </button>
-
-                  <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
-
-                  <a href={`tel:${unifyPhoneNo(activeActionSheet.number)}`} className="block w-full text-center py-4 font-semibold text-lg transition-colors" style={{ color: 'var(--accent)' }}>
-                  {t('contacts.call')}
-                </a>
-                <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
-                <a href={`sms:${unifyPhoneNo(activeActionSheet.number)}`} className="block w-full text-center py-4 font-semibold text-lg transition-colors" style={{ color: 'var(--accent)' }}>
-                  {t('contacts.message')}
-                </a>
-                <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
-                <button onClick={() => { setEditingContact(activeActionSheet); setIsModalOpen(true); setActiveActionSheet(null); }} className="block w-full text-center py-4 font-semibold text-lg transition-colors" style={{ color: 'var(--text-primary)' }}>
-                  {t('contacts.edit')}
-                </button>
-                <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
-                <button onClick={() => handleDelete(activeActionSheet.shortcut)} className="block w-full text-center py-4 font-semibold text-lg transition-colors" style={{ color: 'var(--destructive)' }}>
-                  {t('contacts.delete')}
-                </button>
-              </div>
-
-             <button onClick={() => setActiveActionSheet(null)} className="w-full py-4 font-bold text-lg rounded-2xl shadow-sm transition-colors" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>
-               Zrušit
-             </button>
+{/* Action Sheet via portal */}
+      {activeActionSheet && createPortal(
+        <div className="fixed inset-0 z-[9999]" style={{ height: '100vh', width: '100vw' }}>
+          <div className="absolute inset-0 bg-black/50" onClick={() => setActiveActionSheet(null)} />
+          <div className="absolute bottom-0 left-0 right-0 rounded-t-3xl shadow-2xl p-4 pb-[calc(env(safe-area-inset-bottom)+16px)] max-h-[85vh] overflow-y-auto" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+            <div className="w-1.5 rounded-full mx-auto mb-4" style={{ backgroundColor: 'var(--separator)' }} />
+            <div className="text-center mb-4 px-4">
+              <h3 className="font-bold text-xl truncate" style={{ color: 'var(--text-primary)' }}>{parseContactName(activeActionSheet.name).name}</h3>
+              <p className="font-medium" style={{ color: 'var(--text-secondary)' }}>{unifyPhoneNo(activeActionSheet.number)}</p>
+            </div>
+            <div className="rounded-2xl overflow-hidden mb-4 shadow-sm" style={{ backgroundColor: 'var(--surface)' }}>
+              <button onClick={() => { localStorage.setItem('callback_recipient', activeActionSheet.number); if (setTab) setTab('callback'); setActiveActionSheet(null); }} className="w-full flex items-center gap-4 px-4 py-4 text-left" style={{ backgroundColor: 'var(--surface)' }}>
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(249, 115, 22, 0.1)', color: 'rgba(249, 115, 22, 1)' }}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                </div>
+                <div className="flex-1 text-center"><div className="font-bold" style={{ color: 'var(--text-primary)' }}>{t('contacts.callback')}</div><div className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('contacts.callbackDesc')}</div></div>
+                <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-tertiary)' }}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+              </button>
+              <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
+              <button onClick={() => { localStorage.setItem('sms_recipient', activeActionSheet.number); if (setTab) setTab('send_sms'); setActiveActionSheet(null); }} className="w-full flex items-center gap-4 px-4 py-4 text-left" style={{ backgroundColor: 'var(--surface)' }}>
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', color: 'var(--accent)' }}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                </div>
+                <div className="flex-1 text-center"><div className="font-bold" style={{ color: 'var(--text-primary)' }}>{t('contacts.sendSms')}</div><div className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('contacts.sendSmsDesc')}</div></div>
+                <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-tertiary)' }}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+              </button>
+              <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
+              <a href={`tel:${unifyPhoneNo(activeActionSheet.number)}`} className="block w-full text-center py-4 font-semibold text-lg" style={{ color: 'var(--accent)' }}>{t('contacts.call')}</a>
+              <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
+              <a href={`sms:${unifyPhoneNo(activeActionSheet.number)}`} className="block w-full text-center py-4 font-semibold text-lg" style={{ color: 'var(--accent)' }}>{t('contacts.message')}</a>
+              <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
+              <button onClick={() => { setEditingContact(activeActionSheet); setIsModalOpen(true); setActiveActionSheet(null); }} className="block w-full text-center py-4 font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>{t('contacts.edit')}</button>
+              <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
+              <button onClick={() => handleDelete(activeActionSheet.shortcut)} className="block w-full text-center py-4 font-semibold text-lg" style={{ color: 'var(--destructive)' }}>{t('contacts.delete')}</button>
+            </div>
+            <button onClick={() => setActiveActionSheet(null)} className="w-full py-4 font-bold text-lg rounded-2xl" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Zrušit</button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* Edit/Add Modal */}
-      <ContactModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onSave={handleSaveContact} 
-        initialData={editingContact} 
-      />
+      {/* Modals via portal */}
+      {createPortal(
+        <ContactModal 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+          onSave={handleSaveContact} 
+          initialData={editingContact} 
+        />,
+        document.body
+      )}
     </>
   );
 }
