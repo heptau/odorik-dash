@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import Contacts from './components/Contacts';
 import SendSms from './components/SendSms';
 import Callback from './components/Callback';
@@ -9,7 +9,9 @@ import Activity from './components/Activity';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { SkeletonList } from './components/Skeleton';
 import PullToRefresh from './components/PullToRefresh';
+import OfflineIndicator from './components/OfflineIndicator';
 import { useBalance, useContacts, useActiveCalls, useActivity, useLines } from './hooks';
+import { isOffline } from './api';
 import { useT } from './i18n';
 
 const Statistics = lazy(() => import('./components/Statistics').then(m => ({ default: m.default })));
@@ -43,8 +45,15 @@ function App() {
 		return () => window.removeEventListener('resize', updateVisibleItems);
 	}, []);
 
-	const { balance, loading: balanceLoading, refresh: refreshBalance } = useBalance(creds);
-	const { contacts } = useContacts(creds);
+	const handleAuthError = useCallback(async () => {
+		console.log('Auth error detected, clearing credentials');
+		await clearCredentials();
+		await clearAllCaches();
+		setCreds(null);
+	}, []);
+
+	const { balance, loading: balanceLoading, refresh: refreshBalance } = useBalance(creds, { onAuthError: handleAuthError });
+	const { contacts } = useContacts(creds, handleAuthError);
 	const { calls: activeCalls, loading: activeLoading, hasActive, hangup } = useActiveCalls(creds);
 	const { lines } = useLines(creds);
 	const { activity, loading: activityLoading, loadingMore, error: activityError, selectedType, setSelectedType, selectedLine, setSelectedLine, loadMore } = useActivity(creds);
@@ -125,6 +134,7 @@ function App() {
 
 	return (
 		<div className="min-h-screen flex flex-col md:flex-row pb-[env(safe-area-inset-bottom)]" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+			<OfflineIndicator />
 			{/* SIDEBAR - DESKTOP */}
 			<aside className="hidden md:flex w-72 flex-col sticky top-0 h-screen p-6 shadow-sm z-10" style={{ backgroundColor: 'var(--surface)', borderRightColor: 'var(--separator)' }}>
 				<div className="mb-8 px-2 pt-2">
@@ -143,9 +153,9 @@ function App() {
 						</div>
 						<button
 							onClick={() => refreshBalance(true)}
-							disabled={balanceLoading}
-							className="p-2 rounded-xl transition-colors disabled:opacity-30" style={{ color: 'var(--text-tertiary)' }}
-							title={t('balance.refresh')}
+							disabled={balanceLoading || isOffline()}
+							className={`p-2 rounded-xl transition-colors ${balanceLoading || isOffline() ? 'opacity-30' : ''}`} style={{ color: 'var(--text-tertiary)' }}
+							title={isOffline() ? t('common.offline') : t('balance.refresh')}
 						>
 							<svg className={`w-4 h-4 ${balanceLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
 						</button>
@@ -215,9 +225,9 @@ function App() {
 						</span>
 						<button
 							onClick={() => refreshBalance(true)}
-							disabled={balanceLoading}
-							className="p-1 disabled:opacity-30"
-							aria-label={t('balance.refresh')}
+							disabled={balanceLoading || isOffline()}
+							className={`p-1 ${balanceLoading || isOffline() ? 'opacity-30' : ''}`}
+							aria-label={isOffline() ? t('common.offline') : t('balance.refresh')}
 						>
 							<svg className={`w-3.5 h-3.5 ${balanceLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
 						</button>

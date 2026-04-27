@@ -5,10 +5,18 @@ import type { OdorikCredentials } from '../api';
 interface UseBalanceOptions {
 	autoRefresh?: boolean;
 	refreshInterval?: number;
+	onAuthError?: () => void;
+}
+
+const AUTH_ERROR_PATTERNS = ['401', 'unauthorized', 'přihlášení', 'login', 'neplatné', 'invalid', 'auth'];
+
+function isAuthError(message: string): boolean {
+	const lower = message.toLowerCase();
+	return AUTH_ERROR_PATTERNS.some(p => lower.includes(p));
 }
 
 export function useBalance(creds: OdorikCredentials | null, options: UseBalanceOptions = {}) {
-	const { autoRefresh = true, refreshInterval = CACHE_TTL_10_MIN } = options;
+	const { autoRefresh = true, refreshInterval = CACHE_TTL_10_MIN, onAuthError } = options;
 
 	const [balance, setBalance] = useState<string>('');
 	const [loading, setLoading] = useState(false);
@@ -37,12 +45,14 @@ export function useBalance(creds: OdorikCredentials | null, options: UseBalanceO
 			setBalance(b);
 			await writeCache(cacheKey, b);
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Failed to fetch balance');
+			const message = err instanceof Error ? err.message : 'Failed to fetch balance';
+			setError(message);
 			if (cached) setBalance(cached.data);
+			if (isAuthError(message)) onAuthError?.();
 		} finally {
 			setLoading(false);
 		}
-	}, [creds]);
+	}, [creds, onAuthError]);
 
 	useEffect(() => {
 		if (!creds) return;

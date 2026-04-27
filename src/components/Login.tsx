@@ -1,18 +1,31 @@
 import { useState } from 'react';
 import type { OdorikCredentials } from '../api';
-import { saveCredentials } from '../api';
+import { saveCredentials, fetchBalance } from '../api';
 import { useT } from '../i18n';
 
 export default function Login({ onLogin }: { onLogin: (creds: OdorikCredentials) => void }) {
   const [user, setUser] = useState('');
   const [pass, setPass] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const t = useT();
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (user && pass) {
-      await saveCredentials({ user, pass });
-      onLogin({ user, pass });
+      setLoading(true);
+      setError('');
+      
+      const creds = { user, pass };
+      await saveCredentials(creds);
+      
+      try {
+        await fetchBalance(creds);
+        onLogin(creds);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : t('errors.unknown'));
+        setLoading(false);
+      }
     }
   };
 
@@ -50,6 +63,9 @@ export default function Login({ onLogin }: { onLogin: (creds: OdorikCredentials)
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold tracking-tight" style={titleStyle}>{t('login.title')}</h1>
           <p className="text-sm mt-2" style={subtitleStyle}>{t('login.subtitle')}</p>
+          {error && (
+            <p className="text-sm mt-2 text-red-600 font-medium" style={{ color: 'var(--destructive)' }}>{error}</p>
+          )}
         </div>
         
         <div className="space-y-4">
@@ -79,8 +95,8 @@ export default function Login({ onLogin }: { onLogin: (creds: OdorikCredentials)
           </div>
         </div>
 
-        <button type="submit" className="w-full mt-6 py-3 rounded-xl transition-all font-medium" style={{ backgroundColor: 'var(--accent)', color: 'white' }}>
-          {t('login.submit')}
+        <button type="submit" disabled={loading} className="w-full mt-6 py-3 rounded-xl transition-all font-medium disabled:opacity-50" style={{ backgroundColor: 'var(--accent)', color: 'white' }}>
+          {loading ? t('common.loading') : t('login.submit')}
         </button>
       </form>
     </div>

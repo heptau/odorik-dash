@@ -2,7 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { fetchContacts, addContact, editContact, deleteContact } from '../api';
 import type { Contact, OdorikCredentials } from '../api';
 
-export function useContacts(creds: OdorikCredentials | null) {
+const AUTH_ERROR_PATTERNS = ['401', 'unauthorized', 'přihlášení', 'login', 'neplatné', 'invalid', 'auth'];
+
+function isAuthError(message: string): boolean {
+	const lower = message.toLowerCase();
+	return AUTH_ERROR_PATTERNS.some(p => lower.includes(p));
+}
+
+export function useContacts(creds: OdorikCredentials | null, onAuthError?: () => void) {
 	const [contacts, setContacts] = useState<Contact[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -17,11 +24,13 @@ export function useContacts(creds: OdorikCredentials | null) {
 			const data = await fetchContacts(creds);
 			setContacts(data);
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Failed to load contacts');
+			const message = err instanceof Error ? err.message : 'Failed to load contacts';
+			setError(message);
+			if (isAuthError(message)) onAuthError?.();
 		} finally {
 			setLoading(false);
 		}
-	}, [creds]);
+	}, [creds, onAuthError]);
 
 	const add = useCallback(async (contact: Partial<Contact>) => {
 		if (!creds) return;
