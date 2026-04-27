@@ -6,16 +6,26 @@
 		<meta name="apple-mobile-web-app-title" content="Odorik">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-		<meta name="theme-color" content="#f3f4f6">
+		<meta name="theme-color" content="#3b82f6">
 		<link rel="manifest" href="/app.webmanifest">
-		<link rel="apple-touch-icon" href="/odorik-icon.png">
-		<link href="data:image/x-icon;base64,R0lGODlhIQAeAKECAOM7O/////8AAP8AACH5BAEKAAIALAAAAAAhAB4AAAJLjI+pywYPQZsqWknb3TgjznkfGIokKAZn6a1b6l6wfLCZtbzwpKc87WPYgokh0WE8JoOoY43kVJ2iq6gU6qxSsduedUkEWkedMaUAADs="
-			rel="icon" type="image/x-icon" />
+		<link rel="icon" type="image/svg+xml" href="/odorik-icon.svg">
+		<link rel="apple-touch-icon" href="/odorik-icon.svg">
 		<title>Odorik Dash</title>
 		<script type="module" crossorigin src="/assets/main-1.0.0.js"></script>
 		<link rel="stylesheet" crossorigin href="/assets/main-1.0.0.css">
 	</head>
 	<body>
 		<div id="root"></div>
+		<script>
+			if ('serviceWorker' in navigator) {
+				window.addEventListener('load', () => {
+					navigator.serviceWorker.register('/sw.js').then((registration) => {
+						console.log('SW registered:', registration);
+					}).catch((error) => {
+						console.log('SW registration failed:', error);
+					});
+				});
+			}
+		</script>
 	</body>
 </html>

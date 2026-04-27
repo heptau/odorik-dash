@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && mkdir -p docs/locales && cp src/i18n/locales/*.json docs/locales/ && cp src/CNAME docs/CNAME 2>/dev/null || true",
+    "build": "tsc -b && vite build && mkdir -p docs/locales docs/pwa && cp src/i18n/locales/*.json docs/locales/ && cp src/CNAME docs/CNAME 2>/dev/null || true && cp src/pwa/* docs/ 2>/dev/null || true",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",

@@ -1,0 +1,19 @@
+{
+  "name": "Odorik Dash",
+  "short_name": "Odorik",
+  "description": "Contacts, calls and SMS management for Odorik.cz",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/odorik-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["communication", "utilities"]
+}
