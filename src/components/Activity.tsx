@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { unifyPhoneNo, lookupContactOrLine, parseContactName } from '../api';
 import type { ActivityItem, Contact, OdorikLine } from '../api';
 import { SkeletonList } from './Skeleton';
-import { useT } from '../i18n';
+import { useI18n, useT } from '../i18n';
 import type { FilterType } from '../hooks/useActivity';
 
 interface ActivityProps {
@@ -22,6 +22,84 @@ interface ActivityProps {
 export default function Activity({ activity, loading, loadingMore, error, selectedType, onTypeChange, selectedLine, onLineChange, lines, onLoadMore, contacts = [] }: ActivityProps) {
 	const [search, setSearch] = useState('');
 	const t = useT();
+	const { locale } = useI18n();
+
+	const translate = (str: string) => {
+		const map: Record<string, Record<string, string>> = {
+			cs: { 'Call': 'Volání', 'SMS': 'SMS', 'Received': 'Přijatá', 'Sent': 'Odeslaná', 'Incoming': 'Přijaté', 'Outgoing': 'Odchozí', 'Redirected': 'Přesměrované', 'Missed': 'Zmeškané', 'Answered': 'Přijaté' },
+			en: { 'Call': 'Call', 'SMS': 'SMS', 'Received': 'Received', 'Sent': 'Sent', 'Incoming': 'Incoming', 'Outgoing': 'Outgoing', 'Redirected': 'Redirected', 'Missed': 'Missed', 'Answered': 'Answered' },
+			de: { 'Call': 'Anruf', 'SMS': 'SMS', 'Received': 'Empfangen', 'Sent': 'Gesendet', 'Incoming': 'Eingehend', 'Outgoing': 'Ausgehend', 'Redirected': 'Weitergeleitet', 'Missed': 'Verpasst', 'Answered': 'Angenommen' },
+			es: { 'Call': 'Llamada', 'SMS': 'SMS', 'Received': 'Recibido', 'Sent': 'Enviado', 'Incoming': 'Entrante', 'Outgoing': 'Saliente', 'Redirected': 'Redirigido', 'Missed': 'Perdido', 'Answered': 'Contestado' },
+			fr: { 'Call': 'Appel', 'SMS': 'SMS', 'Received': 'Reçu', 'Sent': 'Envoyé', 'Incoming': 'Entrant', 'Outgoing': 'Sortant', 'Redirected': 'Redirigé', 'Missed': 'Manqué', 'Answered': 'Répondu' },
+			it: { 'Call': 'Chiamata', 'SMS': 'SMS', 'Received': 'Ricevuto', 'Sent': 'Inviato', 'Incoming': 'In entrata', 'Outgoing': 'In uscita', 'Redirected': 'Reindirizzato', 'Missed': 'Perso', 'Answered': 'Risposto' },
+			pl: { 'Call': 'Połączenie', 'SMS': 'SMS', 'Received': 'Odebrane', 'Sent': 'Wysłane', 'Incoming': 'Przychodzące', 'Outgoing': 'Wychodzące', 'Redirected': 'Przekierowane', 'Missed': 'Nieodebrane', 'Answered': 'Odebrane' },
+			pt: { 'Call': 'Chamada', 'SMS': 'SMS', 'Received': 'Recebido', 'Sent': 'Enviado', 'Incoming': 'Entrada', 'Outgoing': 'Saída', 'Redirected': 'Redirecionado', 'Missed': 'Perdido', 'Answered': 'Atendido' },
+			sk: { 'Call': 'Volanie', 'SMS': 'SMS', 'Received': 'Prijatá', 'Sent': 'Odoslaná', 'Incoming': 'Prichádzajúce', 'Outgoing': 'Odchozí', 'Redirected': 'Presmerované', 'Missed': 'Zmeškané', 'Answered': 'Prijaté' },
+			uk: { 'Call': 'Дзвінок', 'SMS': 'SMS', 'Received': 'Отримано', 'Sent': 'Надіслано', 'Incoming': 'Вхідні', 'Outgoing': 'Вихідні', 'Redirected': 'Перенаправлено', 'Missed': 'Пропущено', 'Answered': 'Прийнято' },
+			vi: { 'Call': 'Cuộc gọi', 'SMS': 'SMS', 'Received': 'Đã nhận', 'Sent': 'Đã gửi', 'Incoming': 'Đến', 'Outgoing': 'Đi', 'Redirected': 'Chuyển tiếp', 'Missed': 'Nhỡ', 'Answered': 'Đã trả lời' },
+		};
+		const m = map[locale] || map.en;
+		return m[str] || str;
+	};
+
+	const exportToCsv = () => {
+		const headers = ['DateTime', 'Type', 'Direction', 'Source', 'Destination', 'Name', 'Contact', 'Line', 'Duration', 'Price', 'Status'];
+		const rows = activity.map(item => {
+			const date = new Date(item.date);
+			const isoDate = date.toISOString().slice(0, 19).replace('T', ' ');
+			const srcMatch = lookupContactOrLine(item.source_number, contacts, lines);
+			const dstMatch = lookupContactOrLine(item.destination_number, contacts, lines);
+			
+			const getContactFullName = (match: typeof srcMatch) => {
+				if (match?.type !== 'contact') return match?.type === 'line' ? match.line.name : '';
+				const p = parseContactName(match.contact.name);
+				let full = [p.name, p.surname].filter(Boolean).join(' ');
+				if (p.note) full += ' - ' + p.note;
+				return full;
+			};
+			const srcName = getContactFullName(srcMatch);
+			const dstName = getContactFullName(dstMatch);
+			
+			// Type guards - check type first
+			const isCall = 'type' in item && item.type === 'call';
+			const isSms = 'type' in item && item.type === 'sms';
+			
+			const callItem = isCall ? item as unknown as { direction?: string; status?: string; destination_name?: string; length?: number; price?: string } : null;
+			const smsItem = isSms ? item as unknown as { price?: string } : null;
+			
+			const direction = isSms ? (item.source_number ? translate('Received') : translate('Sent')) : 
+				callItem?.direction === 'in' ? translate('Incoming') : 
+				callItem?.direction === 'out' ? translate('Outgoing') : 
+				callItem?.direction === 'redirected' ? translate('Redirected') : '';
+			const status = isCall ? (callItem?.status === 'missed' ? translate('Missed') : translate('Answered')) : '';
+			
+			const destName = isCall ? callItem?.destination_name || '' : '';
+			const price = callItem?.price || smsItem?.price || '';
+			
+			return [
+				isoDate,
+				isCall ? translate('Call') : translate('SMS'),
+				direction,
+				unifyPhoneNo(item.source_number),
+				unifyPhoneNo(item.destination_number),
+				destName,
+				callItem?.direction === 'in' ? srcName : dstName,
+				String(item.line || ''),
+				isCall ? formatDuration(callItem?.length || 0) : '',
+				price,
+				status
+			].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+		});
+
+		const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `odorik-history-${new Date().toISOString().split('T')[0]}.csv`;
+		a.click();
+		URL.revokeObjectURL(url);
+	};
 
 	const filtered = activity.filter(item => {
 		if (selectedType === 'calls' && item.type !== 'call') return false;
@@ -73,6 +151,20 @@ export default function Activity({ activity, loading, loadingMore, error, select
 		<>
 			<div className="mb-4 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
 				<h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{t('activity.title')}</h2>
+				<div className="flex gap-2">
+					{activity.length > 0 && (
+						<button
+							onClick={exportToCsv}
+							className="px-4 py-2.5 rounded-2xl text-sm font-medium transition-colors btn-press"
+							style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)', borderColor: 'var(--separator)', borderWidth: '1px' }}
+						>
+							<svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+							</svg>
+							Export CSV
+						</button>
+					)}
+				</div>
 				<div className="flex gap-2">
 					<select
 						value={selectedType}
