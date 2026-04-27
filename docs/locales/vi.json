@@ -1,0 +1,95 @@
+{
+  "app": { "name": "Odorik" },
+  "nav": {
+    "contacts": "Liên hệ", "calls": "Lịch sử cuộc gọi", "sms_received": "SMS đã nhận", "sms_sent": "SMS đã gửi",
+    "new_sms": "SMS", "lines": "Đường dây", "sim_cards": "Thẻ SIM", "callback": "Gọi lại",
+    "statistics": "Thống kê", "logout": "Đăng xuất", "settings": "Cài đặt"
+  },
+  "balance": { "credit": "Tín dụng", "refresh": "Làm mới" },
+  "settings": {
+    "title": "Cài đặt", "language": "Ngôn ngữ / Language", "current": "Hiện tại", "auto": "Tự động",
+    "czech": "Čeština", "english": "English", "reloadNote": "Thay đổi ngôn ngữ sẽ có hiệu lực sau khi tải lại ứng dụng.",
+    "reloadApp": "Tải lại", "cache": "Bộ nhớ cache", "clear_cache": "Xóa cache",
+    "clear_cache_desc": "Xóa dữ liệu đã lưu (lịch sử, danh bạ), nhưng vẫn đăng nhập.",
+    "clear_cache_confirm": "Bạn có chắc chắn muốn xóa cache?", "about": "Giới thiệu",
+    "version": "Odorik Dash", "aboutText": "Quản lý liên hệ, cuộc gọi và SMS cho Odorik.cz"
+  },
+  "common": { "retry": "Thử lại" },
+  "contacts": {
+    "title": "Gọi nhanh", "search": "Tìm kiếm...", "no_results": "Không có liên hệ nào phù hợp với tìm kiếm.",
+    "empty": "Bạn chưa có liên hệ nào.", "add": "Thêm liên hệ", "new": "Liên hệ mới",
+    "edit": "Sửa liên hệ", "delete": "Xóa", "error": "Lỗi khi tải liên hệ", "errorTitle": "Lỗi",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa liên hệ này?", "deleteError": "Lỗi khi xóa",
+    "callback": "Gọi lại (Callback)", "callbackDesc": "Odorik sẽ gọi cho bạn và liên hệ", "sendSms": "Gửi SMS",
+    "sendSmsDesc": "Viết tin nhắn mới", "call": "Gọi", "message": "Gửi tin nhắn", "reply": "Trả lời",
+    "name": "Tên", "surname": "Họ", "phone": "Số điện thoại", "shortcut": "Phím tắt", "note": "Ghi chú"
+  },
+  "calls": {
+    "title": "Lịch sử cuộc gọi", "search": "Tìm kiếm...", "no_results": "Không có cuộc gọi nào phù hợp với tìm kiếm.",
+    "empty": "Bạn chưa có cuộc gọi nào.", "shown": "bản ghi", "refresh": "Làm mới",
+    "load_more": "Tải các cuộc gọi cũ hơn", "loading": "Đang tải...", "from": "Từ", "to": "Đến",
+    "line": "Đường dây", "duration": "Thời lượng", "missed": "Nhỡ", "incoming": "Đến", "outgoing": "Đi",
+    "error_loading": "Lỗi khi tải cuộc gọi"
+  },
+  "sms": {
+    "received_title": "SMS đã nhận", "sent_title": "SMS đã gửi", "search": "Tìm kiếm...",
+    "no_results": "Không có SMS nào phù hợp với tìm kiếm.", "empty_received": "Bạn chưa có SMS đã nhận.",
+    "empty_sent": "Bạn chưa có SMS đã gửi.", "refresh": "Làm mới", "load_more": "Tải tin nhắn cũ hơn",
+    "messages": "tin nhắn", "error_loading": "Lỗi khi tải SMS"
+  },
+  "send_sms": {
+    "title": "SMS mới", "recipient": "Người nhận", "message": "Tin nhắn", "send": "Gửi", "sending": "Đang gửi...",
+    "success": "SMS đã được gửi thành công.", "optimize": "Loại bỏ dấu", "placeholder": "Nhập tin nhắn của bạn...",
+    "length": "Độ dài", "parts": "Phần", "mode": "Chế độ", "remaining": "Còn lại", "tip_title": "Mẹo",
+    "tip_text": "Tin nhắn không có dấu rẻ hơn vì 160 ký tự vừa trong một SMS. Với dấu, giới hạn giảm xuống 70 ký tự.",
+    "error_empty": "Điền người nhận và tin nhắn.", "error": "Lỗi khi gửi SMS"
+  },
+  "callback": {
+    "title": "Gọi lại", "your_number": "Số của bạn / Đường dây",
+    "your_number_hint": "Số mà bạn muốn nhận cuộc gọi.", "recipient": "Số được gọi (người nhận)",
+    "line": "Đường dây để thực hiện", "default_line": "Đường dây mặc định", "order": "Đặt cuộc gọi (Callback)",
+    "ordering": "Đang đặt...", "success": "Gọi lại đã được đặt thành công. Chờ cuộc gọi.",
+    "how_it_works": "Nó hoạt động như thế nào?",
+    "how_it_works_text": "Odorik sẽ gọi cho bạn trước và khi bạn nghe máy, nó sẽ kết nối bạn với số được gọi. Phương pháp này hữu ích đặc biệt nếu bạn có cuộc gọi đến rẻ.",
+    "error_empty": "Điền cả hai số điện thoại.", "error": "Lỗi khi đặt callback"
+  },
+  "lines": {
+    "title": "Đường dây", "last_updated": "Đã cập nhật", "subtitle": "Đường dây và thẻ SIM", "refresh": "Làm mới",
+    "refresh_aria": "Làm mới danh sách đường dây", "offline": "Ngoại tuyến - cập nhật không khả dụng",
+    "update_failed": "Cập nhật thất bại - hiển thị dữ liệu đã lưu", "sip_password": "Mật khẩu SIP",
+    "show": "Hiển thị", "hide": "Ẩn", "copy": "Sao chép", "missed_email": "Email cuộc gọi nhỡ",
+    "voicemail": "Hộp thư thoại", "recording": "Ghi âm", "forwarding": "Chuyển tiếp", "callback": "Gọi lại",
+    "error_loading": "Lỗi khi tải đường dây"
+  },
+  "sim_cards": {
+    "title": "Thẻ SIM", "last_updated": "Đã cập nhật", "refresh": "Làm mới",
+    "offline": "Ngoại tuyến - cập nhật không khả dụng", "update_failed": "Cập nhật thất bại - hiển thị dữ liệu đã lưu",
+    "none": "Không có thẻ SIM", "none_assigned": "Không có thẻ SIM nào được gán cho tài khoản này.",
+    "line": "Đường dây", "change_progress": "Thay đổi đang tiến hành", "card_1": "Thẻ SIM",
+    "cards_2_4": "Thẻ SIM", "cards_5": "Thẻ SIM", "error_loading": "Lỗi khi tải thẻ SIM",
+    "data": "Dữ liệu", "voice": "Giọng nói", "data_package": "Gói dữ liệu", "voice_package": "Gói giọng nói",
+    "sim_number": "Số SIM (ICCID)"
+  },
+  "statistics": {
+    "title": "Thống kê", "this_month": "Tháng này", "calls": "Cuộc gọi", "minutes": "Phút", "sms": "SMS",
+    "success_rate": "Tỷ lệ thành công", "missed": "nhỡ", "all_handled": "tất cả đã xử lý",
+    "top_lines": "Đường dây hoạt động nhiều nhất", "no_data": "Không có dữ liệu."
+  },
+  "login": {
+    "title": "Odorik.cz", "subtitle": "Đăng nhập bằng tên và mật khẩu API (hoặc SIP).",
+    "username": "Tên API / SIP", "password": "Mật khẩu", "submit": "Đăng nhập"
+  },
+  "common": {
+    "loading": "Đang tải...", "error": "Lỗi", "retry": "Thử lại", "cancel": "Hủy", "save": "Lưu",
+    "saving": "Đang lưu...", "delete": "Xóa", "confirm_delete": "Bạn có chắc chắn muốn xóa liên hệ này?",
+    "call": "Gọi", "send_message": "Gửi tin nhắn", "offline": "Hiển thị dữ liệu đã lưu - bạn đang ngoại tuyến"
+  },
+  "active_calls": { "title": "Cuộc gọi đang hoạt động", "loading": "Đang tải...", "hangup": "Ngắt máy" },
+  "activity": {
+    "title": "Lịch sử", "search": "Tìm kiếm...", "no_results": "Không có mục nào phù hợp với tìm kiếm.",
+    "empty": "Bạn chưa có lịch sử.", "load_more": "Tải thêm cũ hơn", "filter_type": "Loại",
+    "filter_line": "Đường dây", "all": "Tất cả", "calls_only": "Cuộc gọi", "sms_only": "SMS"
+  },
+  "filter": { "all": "Tất cả", "calls": "Cuộc gọi", "sms": "SMS", "all_lines": "Tất cả đường dây" },
+  "errors": { "network": "Lỗi mạng", "unknown": "Đã xảy ra lỗi" }
+}

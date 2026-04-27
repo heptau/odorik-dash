@@ -1,0 +1,94 @@
+{
+  "app": { "name": "Odorik" },
+  "nav": {
+    "contacts": "Kontakte", "calls": "Anrufverlauf", "sms_received": "Empfangene SMS", "sms_sent": "Gesendete SMS",
+    "new_sms": "SMS", "lines": "Linien", "sim_cards": "SIM-Karten", "callback": "Callback",
+    "statistics": "Statistiken", "logout": "Abmelden", "settings": "Einstellungen"
+  },
+  "balance": { "credit": "Guthaben", "refresh": "Aktualisieren" },
+  "settings": {
+    "title": "Einstellungen", "language": "Sprache / Language", "current": "Aktuell", "auto": "Automatisch",
+    "czech": "Čeština", "english": "English", "reloadNote": "Sprachänderung wird nach dem Neuladen der Anwendung wirksam.",
+    "reloadApp": "Neu laden", "cache": "Cache", "clear_cache": "Cache löschen",
+    "clear_cache_desc": "Löscht gespeicherte Daten (Verlauf, Kontakte), bleibt aber angemeldet.",
+    "clear_cache_confirm": "Möchten Sie den Cache wirklich löschen?", "about": "Über",
+    "version": "Odorik Dash", "aboutText": "Verwaltung von Kontakten, Anrufen und SMS für Odorik.cz"
+  },
+  "common": { "retry": "Erneut versuchen" },
+  "contacts": {
+    "title": "Kurzwahl", "search": "Suchen...", "no_results": "Keine Kontakte entsprechen der Suche.",
+    "empty": "Sie haben noch keine Kontakte.", "add": "Kontakt hinzufügen", "new": "Neuer Kontakt",
+    "edit": "Kontakt bearbeiten", "delete": "Löschen", "error": "Fehler beim Laden der Kontakte", "errorTitle": "Fehler",
+    "confirmDelete": "Möchten Sie diesen Kontakt wirklich löschen?", "deleteError": "Fehler beim Löschen",
+    "callback": "Callback", "callbackDesc": "Odorik ruft Sie und den Kontakt an", "sendSms": "SMS senden",
+    "sendSmsDesc": "Neue Nachricht schreiben", "call": "Anrufen", "message": "Nachricht senden", "reply": "Antworten",
+    "name": "Vorname", "surname": "Nachname", "phone": "Telefonnummer", "shortcut": "Kürzel", "note": "Notiz"
+  },
+  "calls": {
+    "title": "Anrufverlauf", "search": "Suchen...", "no_results": "Keine Anrufe entsprechen der Suche.",
+    "empty": "Sie haben noch keine Anrufe.", "shown": "Einträge", "refresh": "Aktualisieren",
+    "load_more": "Ältere Anrufe laden", "loading": "Laden...", "from": "Von", "to": "An", "line": "Linie",
+    "duration": "Dauer", "missed": "Verpasst", "incoming": "Eingehend", "outgoing": "Ausgehend",
+    "error_loading": "Fehler beim Laden der Anrufe"
+  },
+  "sms": {
+    "received_title": "Empfangene SMS", "sent_title": "Gesendete SMS", "search": "Suchen...",
+    "no_results": "Keine SMS entsprechen der Suche.", "empty_received": "Sie haben noch keine empfangenen SMS.",
+    "empty_sent": "Sie haben noch keine gesendeten SMS.", "refresh": "Aktualisieren",
+    "load_more": "Ältere Nachrichten laden", "messages": "Nachrichten", "error_loading": "Fehler beim Laden der SMS"
+  },
+  "send_sms": {
+    "title": "Neue SMS", "recipient": "Empfänger", "message": "Nachricht", "send": "Senden", "sending": "Senden...",
+    "success": "SMS erfolgreich gesendet.", "optimize": "Diakritika entfernen", "placeholder": "Nachricht eingeben...",
+    "length": "Länge", "parts": "Teile", "mode": "Modus", "remaining": "Verbleibend", "tip_title": "Tipp",
+    "tip_text": "Nachrichten ohne Diakritika (Akzentzeichen) sind günstiger, da 160 Zeichen in eine SMS passen. Mit Diakritika reduziert sich das Limit auf 70 Zeichen.",
+    "error_empty": "Füllen Sie Empfänger und Nachricht aus.", "error": "Fehler beim Senden der SMS"
+  },
+  "callback": {
+    "title": "Callback", "your_number": "Ihre Nummer / Linie",
+    "your_number_hint": "Nummer, unter der Sie den Anruf empfangen möchten.", "recipient": "Angerufene Nummer (Empfänger)",
+    "line": "Linie zur Durchführung", "default_line": "Standardlinie", "order": "Anruf bestellen (Callback)",
+    "ordering": "Bestellen...", "success": "Callback erfolgreich bestellt. Warten Sie auf den Anruf.",
+    "how_it_works": "Wie es funktioniert",
+    "how_it_works_text": "Odorik ruft Sie zuerst an und wenn Sie abnehmen, verbindet Sie mit der angerufenen Nummer. Diese Methode ist besonders vorteilhaft, wenn Sie günstige eingehende Anrufe haben.",
+    "error_empty": "Füllen Sie beide Telefonnummern aus.", "error": "Fehler bei der Callback-Bestellung"
+  },
+  "lines": {
+    "title": "Linien", "last_updated": "Aktualisiert", "subtitle": "Linien und SIM-Karten", "refresh": "Aktualisieren",
+    "refresh_aria": "Linienliste aktualisieren", "offline": "Offline - Aktualisierung nicht verfügbar",
+    "update_failed": "Aktualisierung fehlgeschlagen - zeige gespeicherte Daten", "sip_password": "SIP-Passwort",
+    "show": "Anzeigen", "hide": "Ausblenden", "copy": "Kopieren", "missed_email": "E-Mail für verpasste Anrufe",
+    "voicemail": "Mailbox", "recording": "Aufnahme", "forwarding": "Weiterleitung", "callback": "Callback",
+    "error_loading": "Fehler beim Laden der Linien"
+  },
+  "sim_cards": {
+    "title": "SIM-Karten", "last_updated": "Aktualisiert", "refresh": "Aktualisieren",
+    "offline": "Offline - Aktualisierung nicht verfügbar", "update_failed": "Aktualisierung fehlgeschlagen - zeige gespeicherte Daten",
+    "none": "Keine SIM-Karten", "none_assigned": "Keine SIM-Karten sind diesem Konto zugewiesen.", "line": "Linie",
+    "change_progress": "Änderung läuft", "card_1": "SIM-Karte", "cards_2_4": "SIM-Karten", "cards_5": "SIM-Karten",
+    "error_loading": "Fehler beim Laden der SIM-Karten", "data": "Daten", "voice": "Sprache",
+    "data_package": "Datenpaket", "voice_package": "Sprachpaket", "sim_number": "SIM-Nummer (ICCID)"
+  },
+  "statistics": {
+    "title": "Statistiken", "this_month": "Dieser Monat", "calls": "Anrufe", "minutes": "Minuten", "sms": "SMS",
+    "success_rate": "Erfolgsrate", "missed": "verpasst", "all_handled": "alle bearbeitet",
+    "top_lines": "Aktivste Linien", "no_data": "Keine Daten verfügbar."
+  },
+  "login": {
+    "title": "Odorik.cz", "subtitle": "Melden Sie sich mit API-Benutzername und Passwort (oder SIP) an.",
+    "username": "API / SIP-Benutzername", "password": "Passwort", "submit": "Anmelden"
+  },
+  "common": {
+    "loading": "Laden...", "error": "Fehler", "retry": "Erneut versuchen", "cancel": "Abbrechen", "save": "Speichern",
+    "saving": "Speichern...", "delete": "Löschen", "confirm_delete": "Möchten Sie diesen Kontakt wirklich löschen?",
+    "call": "Anrufen", "send_message": "Nachricht senden", "offline": "Zeige gespeicherte Daten - Sie sind offline"
+  },
+  "active_calls": { "title": "Aktive Anrufe", "loading": "Laden...", "hangup": "Auflegen" },
+  "activity": {
+    "title": "Verlauf", "search": "Suchen...", "no_results": "Keine Einträge entsprechen der Suche.",
+    "empty": "Sie haben noch keinen Verlauf.", "load_more": "Ältere laden", "filter_type": "Typ",
+    "filter_line": "Linie", "all": "Alle", "calls_only": "Anrufe", "sms_only": "SMS"
+  },
+  "filter": { "all": "Alle", "calls": "Anrufe", "sms": "SMS", "all_lines": "Alle Linien" },
+  "errors": { "network": "Netzwerkfehler", "unknown": "Ein Fehler ist aufgetreten" }
+}

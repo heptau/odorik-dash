@@ -1,4 +1,4 @@
-import { useI18n, AVAILABLE_LOCALES, useT } from '../i18n';
+import { useI18n, AVAILABLE_LOCALES, useT, type Locale } from '../i18n';
 
 declare const __APP_VERSION__: string;
 
@@ -11,7 +11,7 @@ export default function Settings({ onClearCache }: SettingsProps) {
 	const t = useT();
 	const version = __APP_VERSION__ || 'dev';
 
-	const handleChange = (newLocale: 'auto' | 'en' | 'cs') => {
+	const handleChange = (newLocale: Locale) => {
 		setLocale(newLocale);
 	};
 
@@ -38,7 +38,7 @@ export default function Settings({ onClearCache }: SettingsProps) {
 							onClick={() => handleChange(l.code)}
 							className="w-full px-4 py-3 flex justify-between items-center transition-colors"
 							style={{
-								backgroundColor: locale === l.code ? 'var(--bg-secondary)' : 'transparent',
+								backgroundColor: 'transparent',
 								borderBottom: i < AVAILABLE_LOCALES.length - 1 ? '0.5px solid var(--separator)' : 'none'
 							}}
 						>
