@@ -7,7 +7,7 @@
   },
   "balance": { "credit": "Kredit", "refresh": "Obnoviť" },
   "settings": {
-    "title": "Nastavenia", "language": "Jazyk / Language", "current": "Aktuálne", "auto": "Automaticky",
+    "title": "Nastavenia", "language": "Jazyk / Language", "language_suggested": "Odporúčané", "language_other": "Ostatné", "current": "Aktuálne", "auto": "Automaticky",
     "czech": "Čeština", "english": "English", "reloadNote": "Zmena jazyka sa prejaví po novom načítaní aplikácie.",
     "reloadApp": "Načítať znovu", "cache": "Cache", "clear_cache": "Vymazať cache",
     "clear_cache_desc": "Vymaže uložené dáta (história, kontakty), ale zostane prihlásený.",

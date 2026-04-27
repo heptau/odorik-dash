@@ -7,7 +7,7 @@
   },
   "balance": { "credit": "Credito", "refresh": "Aggiorna" },
   "settings": {
-    "title": "Impostazioni", "language": "Lingua / Language", "current": "Attuale", "auto": "Automatico",
+    "title": "Impostazioni", "language": "Lingua / Language", "language_suggested": "Suggeriti", "language_other": "Altri", "current": "Attuale", "auto": "Automatico",
     "czech": "Čeština", "english": "English", "reloadNote": "La modifica della lingua verrà applicata al riavvio dell'app.",
     "reloadApp": "Ricarica", "cache": "Cache", "clear_cache": "Cancella cache",
     "clear_cache_desc": "Cancella i dati salvati (cronologia, contatti), ma rimane connesso.",

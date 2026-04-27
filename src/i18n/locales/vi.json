@@ -7,7 +7,7 @@
   },
   "balance": { "credit": "Tín dụng", "refresh": "Làm mới" },
   "settings": {
-    "title": "Cài đặt", "language": "Ngôn ngữ / Language", "current": "Hiện tại", "auto": "Tự động",
+    "title": "Cài đặt", "language": "Ngôn ngữ / Language", "language_suggested": "Đề xuất", "language_other": "Khác", "current": "Hiện tại", "auto": "Tự động",
     "czech": "Čeština", "english": "English", "reloadNote": "Thay đổi ngôn ngữ sẽ có hiệu lực sau khi tải lại ứng dụng.",
     "reloadApp": "Tải lại", "cache": "Bộ nhớ cache", "clear_cache": "Xóa cache",
     "clear_cache_desc": "Xóa dữ liệu đã lưu (lịch sử, danh bạ), nhưng vẫn đăng nhập.",

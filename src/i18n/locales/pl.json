@@ -7,7 +7,7 @@
   },
   "balance": { "credit": "Kredyt", "refresh": "Odśwież" },
   "settings": {
-    "title": "Ustawienia", "language": "Język / Language", "current": "Aktualny", "auto": "Automatycznie",
+    "title": "Ustawienia", "language": "Język / Language", "language_suggested": "Sugerowane", "language_other": "Inne", "current": "Aktualny", "auto": "Automatycznie",
     "czech": "Čeština", "english": "English", "reloadNote": "Zmiana języka zostanie zastosowana po ponownym załadowaniu aplikacji.",
     "reloadApp": "Załaduj ponownie", "cache": "Pamięć podręczna", "clear_cache": "Wyczyść pamięć podręczną",
     "clear_cache_desc": "Usuwa zapisane dane (historia, kontakty), ale pozostaje zalogowany.",

@@ -1,4 +1,4 @@
-import { useI18n, AVAILABLE_LOCALES, useT, type Locale } from '../i18n';
+import { useI18n, getGroupedLocales, useT, type Locale } from '../i18n';
 
 declare const __APP_VERSION__: string;
 
@@ -10,6 +10,26 @@ export default function Settings({ onClearCache }: SettingsProps) {
 	const { locale, setLocale } = useI18n();
 	const t = useT();
 	const version = __APP_VERSION__ || 'dev';
+	const { suggested, other } = getGroupedLocales();
+
+	const renderLocaleButtons = (locales: typeof suggested, isLast: boolean) => locales.map((l, i) => (
+		<button
+			key={l.code}
+			onClick={() => handleChange(l.code)}
+			className="w-full px-4 py-3 flex justify-between items-center transition-colors"
+			style={{
+				backgroundColor: 'transparent',
+				borderBottom: !isLast || i < locales.length - 1 ? '0.5px solid var(--separator)' : 'none'
+			}}
+		>
+			<span style={{ color: 'var(--text-primary)' }}>{l.name}</span>
+			{locale === l.code && (
+				<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" style={{ color: 'var(--accent)' }}>
+					<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+				</svg>
+			)}
+		</button>
+	));
 
 	const handleChange = (newLocale: Locale) => {
 		setLocale(newLocale);
@@ -32,24 +52,20 @@ export default function Settings({ onClearCache }: SettingsProps) {
 					{t('settings.language')}
 				</h3>
 				<div className="rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)' }}>
-					{AVAILABLE_LOCALES.map((l, i) => (
-						<button
-							key={l.code}
-							onClick={() => handleChange(l.code)}
-							className="w-full px-4 py-3 flex justify-between items-center transition-colors"
-							style={{
-								backgroundColor: 'transparent',
-								borderBottom: i < AVAILABLE_LOCALES.length - 1 ? '0.5px solid var(--separator)' : 'none'
-							}}
-						>
-							<span style={{ color: 'var(--text-primary)' }}>{l.name}</span>
-							{locale === l.code && (
-								<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" style={{ color: 'var(--accent)' }}>
-									<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-								</svg>
-							)}
-						</button>
-					))}
+					<div>
+						<h4 className="text-xs font-medium px-4 py-2" style={{ color: 'var(--text-secondary)', backgroundColor: 'var(--surface-secondary)' }}>
+							{t('settings.language_suggested')}
+						</h4>
+						{renderLocaleButtons(suggested, other.length === 0)}
+					</div>
+					{other.length > 0 && (
+						<div>
+							<h4 className="text-xs font-medium px-4 py-2" style={{ color: 'var(--text-secondary)', backgroundColor: 'var(--surface-secondary)' }}>
+								{t('settings.language_other')}
+							</h4>
+							{renderLocaleButtons(other, true)}
+						</div>
+					)}
 				</div>
 			</section>
 

@@ -7,7 +7,7 @@
   },
   "balance": { "credit": "Crédito", "refresh": "Atualizar" },
   "settings": {
-    "title": "Configurações", "language": "Idioma / Language", "current": "Atual", "auto": "Automático",
+    "title": "Configurações", "language": "Idioma / Language", "language_suggested": "Sugeridos", "language_other": "Outros", "current": "Atual", "auto": "Automático",
     "czech": "Čeština", "english": "English", "reloadNote": "A alteração do idioma será aplicada após recarregar a aplicação.",
     "reloadApp": "Recarregar", "cache": "Cache", "clear_cache": "Limpar cache",
     "clear_cache_desc": "Limpa os dados armazenados (histórico, contactos), mas mantém a sessão.",

@@ -7,7 +7,7 @@
   },
   "balance": { "credit": "Кредит", "refresh": "Оновити" },
   "settings": {
-    "title": "Налаштування", "language": "Мова / Language", "current": "Поточна", "auto": "Автоматично",
+    "title": "Налаштування", "language": "Мова / Language", "language_suggested": "Рекомендовані", "language_other": "Інші", "current": "Поточна", "auto": "Автоматично",
     "czech": "Čeština", "english": "English", "reloadNote": "Зміна мови буде застосована після перезавантаження програми.",
     "reloadApp": "Перезавантажити", "cache": "Кеш", "clear_cache": "Очистити кеш",
     "clear_cache_desc": "Видаляє збережені дані (історію, контакти), але залишається в системі.",

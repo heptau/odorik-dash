@@ -111,7 +111,7 @@ export function useT() {
   };
 }
 
-export const AVAILABLE_LOCALES: { code: Locale; name: string }[] = [
+const LOCALES_DATA: { code: Locale; name: string }[] = [
   { code: 'auto', name: 'Auto' },
   { code: 'cs', name: 'Čeština' },
   { code: 'de', name: 'Deutsch' },
@@ -125,3 +125,41 @@ export const AVAILABLE_LOCALES: { code: Locale; name: string }[] = [
   { code: 'uk', name: 'Українська' },
   { code: 'vi', name: 'Tiếng Việt' },
 ];
+
+export const AVAILABLE_LOCALES = LOCALES_DATA;
+
+export function getGroupedLocales(): { suggested: typeof LOCALES_DATA; other: typeof LOCALES_DATA } {
+  const systemLangs = typeof navigator !== 'undefined' ? navigator.languages || [] : [];
+  
+  const supportedCodes = LOCALES_DATA.filter(l => l.code !== 'auto').map(l => l.code) as SupportedLocale[];
+  const supportedLocaleSet = new Set(supportedCodes);
+  
+  const systemSupported: SupportedLocale[] = [];
+  for (const lang of systemLangs) {
+    const prefix = lang.split('-')[0] as SupportedLocale;
+    if (prefix === 'cs' || supportedLocaleSet.has(prefix)) {
+      if (!systemSupported.includes(prefix)) {
+        systemSupported.push(prefix);
+      }
+    }
+  }
+  
+  const suggestedCodes = new Set<Locale>(['auto']);
+  for (const code of systemSupported) {
+    suggestedCodes.add(code);
+  }
+  
+  const otherCodes = LOCALES_DATA
+    .filter(l => l.code !== 'auto' && !suggestedCodes.has(l.code))
+    .map(l => l.code)
+    .sort((a, b) => {
+      const nameA = LOCALES_DATA.find(l => l.code === a)?.name || '';
+      const nameB = LOCALES_DATA.find(l => l.code === b)?.name || '';
+      return nameA.localeCompare(nameB);
+    });
+  
+  const suggested = LOCALES_DATA.filter(l => suggestedCodes.has(l.code));
+  const other = otherCodes.map(code => LOCALES_DATA.find(l => l.code === code)).filter((l): l is typeof LOCALES_DATA[number] => l !== undefined);
+  
+  return { suggested, other };
+}

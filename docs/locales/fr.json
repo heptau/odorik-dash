@@ -7,7 +7,7 @@
   },
   "balance": { "credit": "Crédit", "refresh": "Actualiser" },
   "settings": {
-    "title": "Paramètres", "language": "Langue / Language", "current": "Actuel", "auto": "Automatique",
+    "title": "Paramètres", "language": "Langue / Language", "language_suggested": "Suggérés", "language_other": "Autres", "current": "Actuel", "auto": "Automatique",
     "czech": "Čeština", "english": "English", "reloadNote": "Le changement de langue sera appliqué après le rechargement de l'application.",
     "reloadApp": "Recharger", "cache": "Cache", "clear_cache": "Effacer le cache",
     "clear_cache_desc": "Efface les données stockées (historique, contacts), mais reste connecté.",

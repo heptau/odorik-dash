@@ -7,7 +7,7 @@
   },
   "balance": { "credit": "Guthaben", "refresh": "Aktualisieren" },
   "settings": {
-    "title": "Einstellungen", "language": "Sprache / Language", "current": "Aktuell", "auto": "Automatisch",
+    "title": "Einstellungen", "language": "Sprache / Language", "language_suggested": "Vorgeschlagen", "language_other": "Andere", "current": "Aktuell", "auto": "Automatisch",
     "czech": "Čeština", "english": "English", "reloadNote": "Sprachänderung wird nach dem Neuladen der Anwendung wirksam.",
     "reloadApp": "Neu laden", "cache": "Cache", "clear_cache": "Cache löschen",
     "clear_cache_desc": "Löscht gespeicherte Daten (Verlauf, Kontakte), bleibt aber angemeldet.",

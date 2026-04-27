@@ -23,6 +23,8 @@
   "settings": {
     "title": "Settings",
     "language": "Language",
+    "language_suggested": "Suggested",
+    "language_other": "Other",
     "current": "Current",
     "auto": "Auto",
     "czech": "Čeština",
