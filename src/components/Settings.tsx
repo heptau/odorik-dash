@@ -16,10 +16,10 @@ export default function Settings({ onClearCache }: SettingsProps) {
 		<button
 			key={l.code}
 			onClick={() => handleChange(l.code)}
-			className="w-full px-4 py-3 flex justify-between items-center transition-colors"
+			className={`w-full px-4 py-3 flex justify-between items-center transition-colors ${i === 0 ? 'rounded-t-2xl' : ''} ${isLast && i === locales.length - 1 ? 'rounded-b-2xl' : ''}`}
 			style={{
 				backgroundColor: 'transparent',
-				borderBottom: !isLast || i < locales.length - 1 ? '0.5px solid var(--separator)' : 'none'
+				borderBottom: i < locales.length - 1 ? '0.5px solid var(--separator)' : 'none'
 			}}
 		>
 			<span style={{ color: 'var(--text-primary)' }}>{l.name}</span>
@@ -51,20 +51,22 @@ export default function Settings({ onClearCache }: SettingsProps) {
 				<h3 className="text-xs font-medium ml-4 mb-2" style={{ color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
 					{t('settings.language')}
 				</h3>
-				<div className="rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)' }}>
-					<div>
-						<h4 className="text-xs font-medium px-4 py-2" style={{ color: 'var(--text-secondary)', backgroundColor: 'var(--surface-secondary)' }}>
-							{t('settings.language_suggested')}
-						</h4>
+				<div className="space-y-4">
+					<h4 className="text-xs font-medium ml-4 mb-1" style={{ color: 'var(--text-secondary)' }}>
+						{t('settings.language_suggested')}
+					</h4>
+					<div className="overflow-hidden rounded-2xl" style={{ backgroundColor: 'var(--surface)', border: '0.5px solid var(--separator)' }}>
 						{renderLocaleButtons(suggested, other.length === 0)}
 					</div>
 					{other.length > 0 && (
-						<div>
-							<h4 className="text-xs font-medium px-4 py-2" style={{ color: 'var(--text-secondary)', backgroundColor: 'var(--surface-secondary)' }}>
+						<>
+							<h4 className="text-xs font-medium ml-4 mb-1" style={{ color: 'var(--text-secondary)' }}>
 								{t('settings.language_other')}
 							</h4>
-							{renderLocaleButtons(other, true)}
-						</div>
+							<div className="overflow-hidden rounded-2xl" style={{ backgroundColor: 'var(--surface)', border: '0.5px solid var(--separator)' }}>
+								{renderLocaleButtons(other, true)}
+							</div>
+						</>
 					)}
 				</div>
 			</section>
