@@ -2,7 +2,7 @@
   "app": { "name": "Odorik" },
   "nav": {
     "contacts": "Контакти", "calls": "Історія дзвінків", "sms_received": "Отримані SMS", "sms_sent": "Відправлені SMS",
-    "new_sms": "SMS", "lines": "Лінії", "sim_cards": "SIM-картки", "callback": "Зворотний дзвінок",
+    "new_sms": "SMS", "more": "Більше", "lines": "Лінії", "sim_cards": "SIM-картки", "callback": "Зворотний дзвінок",
     "statistics": "Статистика", "logout": "Вийти", "settings": "Налаштування"
   },
   "balance": { "credit": "Кредит", "refresh": "Оновити" },

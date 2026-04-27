@@ -2,7 +2,7 @@
   "app": { "name": "Odorik" },
   "nav": {
     "contacts": "Liên hệ", "calls": "Lịch sử cuộc gọi", "sms_received": "SMS đã nhận", "sms_sent": "SMS đã gửi",
-    "new_sms": "SMS", "lines": "Đường dây", "sim_cards": "Thẻ SIM", "callback": "Gọi lại",
+    "new_sms": "SMS", "more": "Thêm", "lines": "Đường dây", "sim_cards": "Thẻ SIM", "callback": "Gọi lại",
     "statistics": "Thống kê", "logout": "Đăng xuất", "settings": "Cài đặt"
   },
   "balance": { "credit": "Tín dụng", "refresh": "Làm mới" },

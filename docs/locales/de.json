@@ -2,7 +2,7 @@
   "app": { "name": "Odorik" },
   "nav": {
     "contacts": "Kontakte", "calls": "Anrufverlauf", "sms_received": "Empfangene SMS", "sms_sent": "Gesendete SMS",
-    "new_sms": "SMS", "lines": "Linien", "sim_cards": "SIM-Karten", "callback": "Callback",
+    "new_sms": "SMS", "more": "Mehr", "lines": "Linien", "sim_cards": "SIM-Karten", "callback": "Callback",
     "statistics": "Statistiken", "logout": "Abmelden", "settings": "Einstellungen"
   },
   "balance": { "credit": "Guthaben", "refresh": "Aktualisieren" },

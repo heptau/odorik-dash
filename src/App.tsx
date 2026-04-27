@@ -20,7 +20,27 @@ function App() {
 	const [creds, setCreds] = useState<OdorikCredentials | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [activeTab, setActiveTab] = useState<'contacts' | 'activity' | 'callback' | 'send_sms' | 'lines' | 'statistics' | 'settings'>('contacts');
+	const [showMoreMenu, setShowMoreMenu] = useState(false);
+	const [visibleNavItems, setVisibleNavItems] = useState(5);
 	const t = useT();
+
+	useEffect(() => {
+		const updateVisibleItems = () => {
+			const width = window.innerWidth;
+			if (width >= 768) {
+				setVisibleNavItems(7);
+			} else if (width > 600) {
+				setVisibleNavItems(6);
+			} else if (width >= 480) {
+				setVisibleNavItems(5);
+			} else {
+				setVisibleNavItems(4);
+			}
+		};
+		updateVisibleItems();
+		window.addEventListener('resize', updateVisibleItems);
+		return () => window.removeEventListener('resize', updateVisibleItems);
+	}, []);
 
 	const { balance, loading: balanceLoading, refresh: refreshBalance } = useBalance(creds);
 	const { contacts } = useContacts(creds);
@@ -133,6 +153,16 @@ function App() {
 					{t('nav.contacts')}
 				</button>
 
+				<button onClick={() => setActiveTab('callback')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${activeTab === 'callback' ? '' : ''}`} style={{ backgroundColor: activeTab === 'callback' ? 'var(--bg-secondary)' : 'transparent', color: activeTab === 'callback' ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.516l2.257-1.13a1 1 0 00.502-1.21L9.284 3.684A1 1 0 008.284 3H5z"></path></svg>
+					{t('nav.callback')}
+				</button>
+
+				<button onClick={() => setActiveTab('send_sms')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${activeTab === 'send_sms' ? '' : ''}`} style={{ backgroundColor: activeTab === 'send_sms' ? 'var(--bg-secondary)' : 'transparent', color: activeTab === 'send_sms' ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+					{t('nav.new_sms')}
+				</button>
+
 				<button onClick={() => setActiveTab('activity')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${activeTab === 'activity' ? '' : ''}`} style={{ backgroundColor: activeTab === 'activity' ? 'var(--bg-secondary)' : 'transparent', color: activeTab === 'activity' ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
 					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
 					{t('activity.title')}
@@ -146,16 +176,6 @@ function App() {
 				<button onClick={() => setActiveTab('statistics')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${activeTab === 'statistics' ? '' : ''}`} style={{ backgroundColor: activeTab === 'statistics' ? 'var(--bg-secondary)' : 'transparent', color: activeTab === 'statistics' ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
 					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
 					{t('nav.statistics')}
-				</button>
-
-				<button onClick={() => setActiveTab('send_sms')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${activeTab === 'send_sms' ? '' : ''}`} style={{ backgroundColor: activeTab === 'send_sms' ? 'var(--bg-secondary)' : 'transparent', color: activeTab === 'send_sms' ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-					{t('nav.new_sms')}
-				</button>
-
-				<button onClick={() => setActiveTab('callback')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${activeTab === 'callback' ? '' : ''}`} style={{ backgroundColor: activeTab === 'callback' ? 'var(--bg-secondary)' : 'transparent', color: activeTab === 'callback' ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.516l2.257-1.13a1 1 0 00.502-1.21L9.284 3.684A1 1 0 008.284 3H5z"></path></svg>
-					{t('nav.callback')}
 				</button>
 
 				<div className="pt-4">
@@ -210,27 +230,82 @@ function App() {
 
 			{/* MOBILE BOTTOM NAVIGATION */}
 			<nav className="md:hidden fixed bottom-0 left-0 right-0 blur-bg border-t flex justify-around safe-bottom z-50 pb-[env(safe-area-inset-bottom)]" style={{ borderTopColor: 'var(--separator)', backgroundColor: 'var(--surface)' }}>
-				<button onClick={() => setActiveTab('contacts')} className={`flex-1 py-1.5 flex flex-col items-center justify-center transition-opacity`} style={{ color: activeTab === 'contacts' ? 'var(--accent)' : 'var(--text-tertiary)' }}>
-					<svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg>
-					<span className="text-[9px] font-medium leading-none">{t('nav.contacts')}</span>
-				</button>
-				<button onClick={() => setActiveTab('activity')} className={`flex-1 py-1.5 flex flex-col items-center justify-center transition-opacity`} style={{ color: activeTab === 'activity' ? 'var(--accent)' : 'var(--text-tertiary)' }}>
-					<svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-					<span className="text-[9px] font-medium leading-none">{t('activity.title')}</span>
-				</button>
-				<button onClick={() => setActiveTab('send_sms')} className={`flex-1 py-1.5 flex flex-col items-center justify-center transition-opacity`} style={{ color: activeTab === 'send_sms' ? 'var(--accent)' : 'var(--text-tertiary)' }}>
-					<svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-					<span className="text-[9px] font-medium leading-none">{t('nav.new_sms')}</span>
-				</button>
-				<button onClick={() => setActiveTab('lines')} className={`flex-1 py-1.5 flex flex-col items-center justify-center transition-opacity`} style={{ color: activeTab === 'lines' ? 'var(--accent)' : 'var(--text-tertiary)' }}>
-					<svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-					<span className="text-[9px] font-medium leading-none">{t('nav.lines')}</span>
-				</button>
-				<button onClick={() => setActiveTab('settings')} className={`flex-1 py-1.5 flex flex-col items-center justify-center transition-opacity`} style={{ color: activeTab === 'settings' ? 'var(--accent)' : 'var(--text-tertiary)' }}>
-					<svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-					<span className="text-[9px] font-medium leading-none">{t('nav.settings')}</span>
-				</button>
+				{(() => {
+					const navItems: { id: string; label: string; icon: string }[] = [
+						{ id: 'contacts', label: t('nav.contacts'), icon: 'M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2' },
+						{ id: 'callback', label: t('nav.callback'), icon: 'M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.516l2.257-1.13a1 1 0 00.502-1.21L9.284 3.684A1 1 0 008.284 3H5z' },
+						{ id: 'send_sms', label: t('nav.new_sms'), icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
+						{ id: 'activity', label: t('activity.title'), icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+						{ id: 'lines', label: t('nav.lines'), icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' },
+						{ id: 'statistics', label: t('nav.statistics'), icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+						{ id: 'settings', label: t('nav.settings'), icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z' },
+					];
+					const visibleItems = navItems.slice(0, visibleNavItems);
+					const hiddenItems = navItems.slice(visibleNavItems);
+					return (
+						<>
+							{visibleItems.map(item => (
+								<button key={item.id} onClick={() => setActiveTab(item.id as typeof activeTab)} className={`flex-1 py-1.5 flex flex-col items-center justify-center transition-opacity`} style={{ color: activeTab === item.id ? 'var(--accent)' : 'var(--text-tertiary)' }}>
+									<svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={item.icon}></path></svg>
+									<span className="text-[9px] font-medium leading-none">{item.label}</span>
+								</button>
+							))}
+							{hiddenItems.length > 0 && (
+								<button onClick={() => setShowMoreMenu(true)} className={`flex-1 py-1.5 flex flex-col items-center justify-center transition-opacity`} style={{ color: 'var(--text-tertiary)' }}>
+									<svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+									<span className="text-[9px] font-medium leading-none">{t('nav.more')}</span>
+								</button>
+							)}
+						</>
+					);
+				})()}
 			</nav>
+
+			{/* MORE MENU MODAL */}
+			{showMoreMenu && (() => {
+				const navItems: { id: string; label: string; icon: string }[] = [
+					{ id: 'contacts', label: t('nav.contacts'), icon: 'M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2' },
+					{ id: 'callback', label: t('nav.callback'), icon: 'M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.516l2.257-1.13a1 1 0 00.502-1.21L9.284 3.684A1 1 0 008.284 3H5z' },
+					{ id: 'send_sms', label: t('nav.new_sms'), icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
+					{ id: 'activity', label: t('activity.title'), icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+					{ id: 'lines', label: t('nav.lines'), icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' },
+					{ id: 'statistics', label: t('nav.statistics'), icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+					{ id: 'settings', label: t('nav.settings'), icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z' },
+				];
+				const hiddenItems = navItems.slice(visibleNavItems);
+				return (
+					<div className="md:hidden fixed inset-0 z-50 flex items-end">
+						<div className="absolute inset-0 bg-black/50" onClick={() => setShowMoreMenu(false)} />
+						<div className="relative w-full rounded-t-3xl animate-in slide-in-from-bottom duration-200" style={{ backgroundColor: 'var(--surface)' }}>
+							<div className="p-4 border-b" style={{ borderBottomColor: 'var(--separator)' }}>
+								<div className="w-12 h-1.5 rounded-full mx-auto" style={{ backgroundColor: 'var(--separator)' }} />
+							</div>
+							<div className="p-2">
+								{hiddenItems.map(item => (
+									<button
+										key={item.id}
+										onClick={() => { setActiveTab(item.id as typeof activeTab); setShowMoreMenu(false); }}
+										className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-colors"
+										style={{ color: 'var(--text-primary)' }}
+									>
+										<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon}></path></svg>
+										<span className="font-medium">{item.label}</span>
+									</button>
+								))}
+								<button
+									onClick={() => { handleLogout(); setShowMoreMenu(false); }}
+									className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-colors"
+									style={{ color: 'var(--destructive)' }}
+								>
+									<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+									<span className="font-medium">{t('nav.logout')}</span>
+								</button>
+							</div>
+							<div className="pb-6"></div>
+						</div>
+					</div>
+				);
+			})()}
 		</div>
 	);
 }

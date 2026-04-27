@@ -2,7 +2,7 @@
   "app": { "name": "Odorik" },
   "nav": {
     "contacts": "Kontakty", "calls": "História hovorov", "sms_received": "Prijaté SMS", "sms_sent": "Odoslané SMS",
-    "new_sms": "SMS", "lines": "Linky", "sim_cards": "SIM karty", "callback": "Callback",
+    "new_sms": "SMS", "more": "Viac", "lines": "Linky", "sim_cards": "SIM karty", "callback": "Callback",
     "statistics": "Štatistiky", "logout": "Odhlásiť sa", "settings": "Nastavenia"
   },
   "balance": { "credit": "Kredit", "refresh": "Obnoviť" },
