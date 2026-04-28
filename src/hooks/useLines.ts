@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchLines, readCache, writeCache, getLinesCacheKey, isCacheStale, isOffline, CACHE_TTL_1_DAY } from '../api';
+import { fetchLines, readCache, writeCache, getLinesCacheKey, isCacheStale, isOffline, getCacheTTL } from '../api';
 import type { OdorikLine, OdorikCredentials } from '../api';
 
 type LinesCache = { lines: OdorikLine[]; ts: number };
@@ -37,7 +37,7 @@ export function useLines(creds: OdorikCredentials | null) {
 				setLines(cached.data.lines);
 				setLoading(false);
 
-				if (isCacheStale(cached, CACHE_TTL_1_DAY) && !isOffline()) {
+				if (isCacheStale(cached, getCacheTTL('lines')) && !isOffline()) {
 					load(false);
 				}
 			} else {

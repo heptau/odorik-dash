@@ -622,6 +622,18 @@ export const writeCache = async <T>(key: string, data: T): Promise<void> => {
 /** Cache TTL constants */
 export const CACHE_TTL_1_DAY = 24 * 60 * 60 * 1000;
 export const CACHE_TTL_10_MIN = 10 * 60 * 1000;
+export const CACHE_TTL_7_DAYS = 7 * 24 * 60 * 60 * 1000;
+
+export const getCacheTTL = (key: 'contacts' | 'activity' | 'lines'): number => {
+	try {
+		const stored = localStorage.getItem('cache_ttl');
+		if (stored) {
+			const parsed = JSON.parse(stored);
+			return parsed[key] || CACHE_TTL_1_DAY;
+		}
+	} catch {}
+	return CACHE_TTL_1_DAY;
+};
 
 /** A cache entry that stores data along with the time it was written. */
 export interface TimestampedCacheEntry<T> {

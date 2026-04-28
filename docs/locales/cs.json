@@ -18,7 +18,7 @@
   },
   "balance": {
     "credit": "Kredit",
-    "refresh": "Obnovit"
+    "remaining": "Zůstatek"
   },
   "settings": {
     "title": "Nastavení",
@@ -35,6 +35,14 @@
     "clear_cache": "Smazat cache",
     "clear_cache_desc": "Smaže uložená data (historie, kontakty), ale zůstane přihlášen.",
     "clear_cache_confirm": "Opravdu smazat cache?",
+    "cache_contacts": "Kontakty",
+    "cache_activity": "Aktivita",
+    "cache_lines": "Linky / SIM",
+    "cache_ttl_1h": "1 hodina",
+    "cache_ttl_6h": "6 hodin",
+    "cache_ttl_1d": "1 den",
+    "cache_ttl_3d": "3 dny",
+    "cache_ttl_7d": "7 dní",
     "about": "O aplikaci",
     "version": "Odorik Dash",
     "aboutText": "Správa kontaktů, hovorů a SMS pro Odorik.cz",
@@ -88,10 +96,12 @@
     "to": "Na",
     "line": "Linka",
     "duration": "Délka",
+    "price": "Cena",
     "missed": "Zmeškaný",
     "incoming": "Příchozí",
     "outgoing": "Odchozí",
-    "error_loading": "Chyba při stahování hovorů"
+    "error_loading": "Chyba při stahování hovorů",
+    "time": "Čas"
   },
   "sms": {
     "received_title": "Přijaté SMS",

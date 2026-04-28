@@ -16,6 +16,25 @@ export default function Settings({ onClearCache }: SettingsProps) {
 	const [updateStatus, setUpdateStatus] = useState<'idle' | 'checking' | 'available' | 'up-to-date' | 'no-sw'>('idle');
 	const [updateInfo, setUpdateInfo] = useState('');
 
+	const [cacheTTL, setCacheTTL] = useState(() => {
+		const stored = localStorage.getItem('cache_ttl');
+		return stored ? JSON.parse(stored) : { contacts: 86400000, activity: 86400000, lines: 86400000 };
+	});
+
+	const saveCacheTTL = (key: string, value: number) => {
+		const newTTL = { ...cacheTTL, [key]: value };
+		setCacheTTL(newTTL);
+		localStorage.setItem('cache_ttl', JSON.stringify(newTTL));
+	};
+
+	const cacheOptions = [
+		{ value: 3600000, label: t('settings.cache_ttl_1h') },
+		{ value: 21600000, label: t('settings.cache_ttl_6h') },
+		{ value: 86400000, label: t('settings.cache_ttl_1d') },
+		{ value: 259200000, label: t('settings.cache_ttl_3d') },
+		{ value: 604800000, label: t('settings.cache_ttl_7d') },
+	];
+
 	const checkForUpdates = async () => {
 		setUpdateStatus('checking');
 		
@@ -108,17 +127,56 @@ export default function Settings({ onClearCache }: SettingsProps) {
 				<h3 className="text-xs font-medium ml-4 mb-2" style={{ color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
 					{t('settings.cache')}
 				</h3>
-				<div className="rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)' }}>
-					<button
-						onClick={handleClearCache}
-						className="w-full px-4 py-3 flex justify-between items-center transition-colors"
-						style={{ color: 'var(--destructive)' }}
-					>
-						<span>{t('settings.clear_cache')}</span>
-						<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-						</svg>
-					</button>
+				<div className="space-y-3">
+					{/* Cache TTL Settings */}
+					<div className="rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)' }}>
+						<div className="px-4 py-3 flex justify-between items-center" style={{ borderBottom: '0.5px solid var(--separator)' }}>
+							<span style={{ color: 'var(--text-primary)' }}>{t('settings.cache_contacts')}</span>
+							<select
+								value={cacheTTL.contacts}
+								onChange={(e) => saveCacheTTL('contacts', Number(e.target.value))}
+								className="text-sm px-2 py-1 rounded-lg border outline-none"
+								style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--separator)', color: 'var(--text-secondary)' }}
+							>
+								{cacheOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+							</select>
+						</div>
+						<div className="px-4 py-3 flex justify-between items-center" style={{ borderBottom: '0.5px solid var(--separator)' }}>
+							<span style={{ color: 'var(--text-primary)' }}>{t('settings.cache_activity')}</span>
+							<select
+								value={cacheTTL.activity}
+								onChange={(e) => saveCacheTTL('activity', Number(e.target.value))}
+								className="text-sm px-2 py-1 rounded-lg border outline-none"
+								style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--separator)', color: 'var(--text-secondary)' }}
+							>
+								{cacheOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+							</select>
+						</div>
+						<div className="px-4 py-3 flex justify-between items-center">
+							<span style={{ color: 'var(--text-primary)' }}>{t('settings.cache_lines')}</span>
+							<select
+								value={cacheTTL.lines}
+								onChange={(e) => saveCacheTTL('lines', Number(e.target.value))}
+								className="text-sm px-2 py-1 rounded-lg border outline-none"
+								style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--separator)', color: 'var(--text-secondary)' }}
+							>
+								{cacheOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+							</select>
+						</div>
+					</div>
+					{/* Clear Cache Button */}
+					<div className="rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)' }}>
+						<button
+							onClick={handleClearCache}
+							className="w-full px-4 py-3 flex justify-between items-center transition-colors"
+							style={{ color: 'var(--destructive)' }}
+						>
+							<span>{t('settings.clear_cache')}</span>
+							<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+							</svg>
+						</button>
+					</div>
 				</div>
 			</section>
 

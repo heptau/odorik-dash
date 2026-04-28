@@ -5,13 +5,22 @@
     "new_sms": "SMS", "more": "Plus", "lines": "Lignes", "sim_cards": "Cartes SIM", "callback": "Callback",
     "statistics": "Statistiques", "logout": "Déconnexion", "settings": "Paramètres"
   },
-  "balance": { "credit": "Crédit", "refresh": "Actualiser" },
+  "balance": { "credit": "Crédit", "refresh": "Actualiser", "remaining": "Solde" },
   "settings": {
     "title": "Paramètres", "language": "Langue / Language", "language_suggested": "Suggérés", "language_other": "Autres", "current": "Actuel", "auto": "Automatique",
     "czech": "Čeština", "english": "English", "reloadNote": "Le changement de langue sera appliqué après le rechargement de l'application.",
     "reloadApp": "Recharger", "cache": "Cache", "clear_cache": "Effacer le cache",
     "clear_cache_desc": "Efface les données stockées (historique, contacts), mais reste connecté.",
-    "clear_cache_confirm": "Voulez-vous vraiment effacer le cache?", "about": "À propos",
+    "clear_cache_confirm": "Voulez-vous vraiment effacer le cache?",
+    "cache_contacts": "Contacts",
+    "cache_activity": "Activité",
+    "cache_lines": "Lignes / SIM",
+    "cache_ttl_1h": "1 heure",
+    "cache_ttl_6h": "6 heures",
+    "cache_ttl_1d": "1 jour",
+    "cache_ttl_3d": "3 jours",
+    "cache_ttl_7d": "7 jours",
+    "about": "À propos",
     "version": "Odorik Dash", "aboutText": "Gestion des contacts, appels et SMS pour Odorik.cz", "update_check": "Vérifier les mises à jour", "update_checking": "Vérification...", "update_available": "Mise à jour disponible", "update_latest": "Vous avez la dernière version", "update_error": "Échec de la vérification", "check_update": "Vérifier", "update_now": "Mettre à jour"
   },
   "common": { "retry": "Réessayer" },
@@ -31,7 +40,7 @@
     "empty": "Vous n'avez pas encore d'appels.", "shown": "enregistrements", "refresh": "Actualiser",
     "load_more": "Charger les appels plus anciens", "loading": "Chargement...", "from": "De", "to": "À",
     "line": "Ligne", "duration": "Durée", "missed": "Manqué", "incoming": "Entrant", "outgoing": "Sortant",
-    "error_loading": "Erreur lors du chargement des appels"
+    "error_loading": "Erreur lors du chargement des appels", "time": "Heure", "price": "Prix"
   },
   "sms": {
     "received_title": "SMS reçus", "sent_title": "SMS envoyés", "search": "Rechercher...",

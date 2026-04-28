@@ -5,13 +5,21 @@
     "new_sms": "SMS", "more": "Mehr", "lines": "Linien", "sim_cards": "SIM-Karten", "callback": "Callback",
     "statistics": "Statistiken", "logout": "Abmelden", "settings": "Einstellungen"
   },
-  "balance": { "credit": "Guthaben", "refresh": "Aktualisieren" },
+  "balance": { "credit": "Guthaben", "refresh": "Aktualisieren", "remaining": "Kontostand" },
   "settings": {
     "title": "Einstellungen", "language": "Sprache / Language", "language_suggested": "Vorgeschlagen", "language_other": "Andere", "current": "Aktuell", "auto": "Automatisch",
     "czech": "Čeština", "english": "English", "reloadNote": "Sprachänderung wird nach dem Neuladen der Anwendung wirksam.",
     "reloadApp": "Neu laden", "cache": "Cache", "clear_cache": "Cache löschen",
     "clear_cache_desc": "Löscht gespeicherte Daten (Verlauf, Kontakte), bleibt aber angemeldet.",
-    "clear_cache_confirm": "Möchten Sie den Cache wirklich löschen?", "about": "Über",
+    "clear_cache_confirm": "Möchten Sie den Cache wirklich löschen?",
+    "cache_contacts": "Kontakte",
+    "cache_activity": "Aktivität",
+    "cache_lines": "Linien / SIM",
+    "cache_ttl_1h": "1 Stunde",
+    "cache_ttl_6h": "6 Stunden",
+    "cache_ttl_1d": "1 Tag",
+    "cache_ttl_3d": "3 Tage",
+    "cache_ttl_7d": "7 Tage", "about": "Über",
     "version": "Odorik Dash", "aboutText": "Verwaltung von Kontakten, Anrufen und SMS für Odorik.cz",
     "update_check": "Nach Updates suchen",
     "update_checking": "Prüfe...",
@@ -36,7 +44,7 @@
     "empty": "Sie haben noch keine Anrufe.", "shown": "Einträge", "refresh": "Aktualisieren",
     "load_more": "Ältere Anrufe laden", "loading": "Laden...", "from": "Von", "to": "An", "line": "Linie",
     "duration": "Dauer", "missed": "Verpasst", "incoming": "Eingehend", "outgoing": "Ausgehend",
-    "error_loading": "Fehler beim Laden der Anrufe"
+    "error_loading": "Fehler beim Laden der Anrufe", "time": "Zeit", "price": "Preis"
   },
   "sms": {
     "received_title": "Empfangene SMS", "sent_title": "Gesendete SMS", "search": "Suchen...",

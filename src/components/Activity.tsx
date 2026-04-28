@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { unifyPhoneNo, lookupContactOrLine, parseContactName } from '../api';
 import type { ActivityItem, Contact, OdorikLine } from '../api';
 import { SkeletonList } from './Skeleton';
@@ -17,10 +18,12 @@ interface ActivityProps {
 	lines: OdorikLine[];
 	onLoadMore: () => void;
 	contacts?: Contact[];
+	balance?: { amount: string; currency: string };
 }
 
-export default function Activity({ activity, loading, loadingMore, error, selectedType, onTypeChange, selectedLine, onLineChange, lines, onLoadMore, contacts = [] }: ActivityProps) {
+export default function Activity({ activity, loading, loadingMore, error, selectedType, onTypeChange, selectedLine, onLineChange, lines, onLoadMore, contacts = [], balance }: ActivityProps) {
 	const [search, setSearch] = useState('');
+	const [selectedItem, setSelectedItem] = useState<ActivityItem | null>(null);
 	const t = useT();
 	const { locale } = useI18n();
 
@@ -41,6 +44,169 @@ export default function Activity({ activity, loading, loadingMore, error, select
 		const m = map[locale] || map.en;
 		return m[str] || str;
 	};
+
+	const formatPrice = (price: string | number | undefined, round = false) => {
+		if (price === undefined || price === null) return '-';
+		const num = typeof price === 'string' ? parseFloat(price.replace(',', '.')) : price;
+		if (isNaN(num)) return String(price);
+		const formatted = round ? num.toFixed(2) : num.toString();
+		return `${formatted} Kč`;
+	};
+
+	const formatPriceList = (price: string | number | undefined) => formatPrice(price, true);
+	const formatPriceDetail = (price: string | number | undefined) => formatPrice(price, false);
+
+	function CallDetail({ item, lines, translate, t, balance }: { item: ActivityItem & { type: 'call' }; lines: OdorikLine[]; translate: (str: string) => string; t: (key: string) => string; balance?: { amount: string; currency: string } }) {
+		const { locale } = useI18n();
+		const c = item as unknown as { direction?: string; status?: string; destination_name?: string; length?: number; price?: string };
+		const isMissed = c.status === 'missed';
+		const isInbound = c.direction === 'in';
+		const isRedirected = c.direction === 'redirected';
+
+		const srcMatch = lookupContactOrLine(item.source_number, contacts, lines);
+		const dstMatch = lookupContactOrLine(item.destination_number, contacts, lines);
+
+		const formatDate = (date: string) => {
+			const d = new Date(date);
+			const pad = (n: number) => n.toString().padStart(2, '0');
+			const dateStr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+			const dayOfWeek = d.toLocaleDateString(locale, { weekday: 'long' });
+			return { dateStr, dayOfWeek };
+		};
+
+		const formatLine = () => {
+			const lineName = lines.find(l => String(l.id) === String(item.line))?.name;
+			const lineId = String(item.line);
+			if (lineName) return { name: lineName, id: lineId };
+			return { name: lineId, id: lineId };
+		};
+
+		const DetailRow = ({ label, value, subValue }: { label: string; value: string; subValue?: string }) => (
+			<div className="flex justify-between py-2" style={{ borderBottom: '0.5px solid var(--separator)' }}>
+				<span style={{ color: 'var(--text-secondary)' }}>{label}</span>
+				<div className="text-right">
+					<span className="font-medium block" style={{ color: 'var(--text-primary)' }}>{value}</span>
+					{subValue && <span className="block text-sm" style={{ color: 'var(--text-tertiary)' }}>{subValue}</span>}
+				</div>
+			</div>
+		);
+
+		const DetailRowMulti = ({ label, topValue, bottomValue }: { label: string; topValue: string; bottomValue?: string }) => (
+			<div className="flex justify-between py-2" style={{ borderBottom: '0.5px solid var(--separator)' }}>
+				<span style={{ color: 'var(--text-secondary)' }}>{label}</span>
+				<div className="text-right">
+					<span className="font-medium" style={{ color: 'var(--text-primary)' }}>{topValue}</span>
+					{bottomValue && <span className="block text-sm" style={{ color: 'var(--text-tertiary)' }}>{bottomValue}</span>}
+				</div>
+			</div>
+		);
+
+		const lineInfo = formatLine();
+		const dateInfo = formatDate(item.date);
+
+		return (
+			<div className="space-y-3">
+				<div className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+					<div
+						className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+						style={{
+							backgroundColor: isMissed ? 'var(--destructive)' : isInbound ? 'var(--success)' : 'var(--accent)',
+							color: 'white'
+						}}
+					>
+						{isMissed ? (
+							<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7l2.293-2.293M15 7l2.293 2.293M15 7h4"></path></svg>
+						) : isInbound ? (
+							<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+						) : (
+							<svg className="w-6 h-6 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+						)}
+					</div>
+					<div className="flex-1">
+						<span className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>{c.destination_name || translate('Call')}</span>
+						<span className="block text-sm" style={{ color: isMissed ? 'var(--destructive)' : 'var(--text-secondary)' }}>
+							{isMissed ? translate('Missed') : isRedirected ? translate('Redirected') : isInbound ? translate('Incoming') : translate('Outgoing')}
+						</span>
+					</div>
+					<div className="text-right">
+						<span className="font-mono text-sm" style={{ color: 'var(--text-tertiary)' }}>#{item.id}</span>
+					</div>
+				</div>
+
+				<DetailRowMulti label={t('calls.from')} topValue={unifyPhoneNo(item.source_number) || '-'} bottomValue={srcMatch?.type === 'contact' ? srcMatch.contact.name : undefined} />
+				<DetailRowMulti label={t('calls.to')} topValue={unifyPhoneNo(item.destination_number) || '-'} bottomValue={dstMatch?.type === 'contact' ? dstMatch.contact.name : undefined} />
+
+				<DetailRowMulti label={t('calls.line')} topValue={lineInfo.name} bottomValue={lineInfo.id} />
+
+				<DetailRow label={t('calls.duration')} value={formatDuration(c.length || 0)} />
+				<DetailRowMulti label={t('calls.price')} topValue={formatPriceDetail(c.price)} bottomValue={balance ? `${t('balance.remaining')}: ${balance.amount} ${balance.currency}` : undefined} />
+				<DetailRowMulti label={t('calls.time')} topValue={dateInfo.dateStr} bottomValue={dateInfo.dayOfWeek} />
+			</div>
+		);
+	}
+
+	function SmsDetail({ item, lines, t, balance }: { item: ActivityItem & { type: 'sms' }; lines: OdorikLine[]; t: (key: string) => string; balance?: { amount: string; currency: string } }) {
+		const { locale } = useI18n();
+		const s = item as unknown as { price?: string };
+
+		const srcMatch = lookupContactOrLine(item.source_number, contacts, lines);
+		const dstMatch = lookupContactOrLine(item.destination_number, contacts, lines);
+
+		const formatDate = (date: string) => {
+			const d = new Date(date);
+			const pad = (n: number) => n.toString().padStart(2, '0');
+			const dateStr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+			const dayOfWeek = d.toLocaleDateString(locale, { weekday: 'long' });
+			return { dateStr, dayOfWeek };
+		};
+
+		const formatLine = () => {
+			const lineName = lines.find(l => String(l.id) === String(item.line))?.name;
+			const lineId = String(item.line);
+			if (lineName) return { name: lineName, id: lineId };
+			return { name: lineId, id: lineId };
+		};
+
+		const DetailRowMulti = ({ label, topValue, bottomValue }: { label: string; topValue: string; bottomValue?: string }) => (
+			<div className="flex justify-between py-2" style={{ borderBottom: '0.5px solid var(--separator)' }}>
+				<span style={{ color: 'var(--text-secondary)' }}>{label}</span>
+				<div className="text-right">
+					<span className="font-medium" style={{ color: 'var(--text-primary)' }}>{topValue}</span>
+					{bottomValue && <span className="block text-sm" style={{ color: 'var(--text-tertiary)' }}>{bottomValue}</span>}
+				</div>
+			</div>
+		);
+
+		const lineInfo = formatLine();
+		const dateInfo = formatDate(item.date);
+
+		return (
+			<div className="space-y-3">
+				<div className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+					<div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--accent)', color: 'white' }}>
+						<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+					</div>
+					<div className="flex-1">
+						<span className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>{translate('SMS')}</span>
+						<span className="block text-sm" style={{ color: 'var(--text-secondary)' }}>
+							{item.source_number ? translate('Received') : translate('Sent')}
+						</span>
+					</div>
+					<div className="text-right">
+						<span className="font-mono text-sm" style={{ color: 'var(--text-tertiary)' }}>#{item.id}</span>
+					</div>
+				</div>
+
+				<DetailRowMulti label="Od" topValue={unifyPhoneNo(item.source_number) || '-'} bottomValue={srcMatch?.type === 'contact' ? srcMatch.contact.name : undefined} />
+				<DetailRowMulti label="Na" topValue={unifyPhoneNo(item.destination_number) || '-'} bottomValue={dstMatch?.type === 'contact' ? dstMatch.contact.name : undefined} />
+
+				<DetailRowMulti label={t('calls.line')} topValue={lineInfo.name} bottomValue={lineInfo.id} />
+
+				<DetailRowMulti label={t('calls.price')} topValue={formatPriceDetail(s.price)} bottomValue={balance ? `${t('balance.remaining')}: ${balance.amount} ${balance.currency}` : undefined} />
+				<DetailRowMulti label={t('calls.time')} topValue={dateInfo.dateStr} bottomValue={dateInfo.dayOfWeek} />
+			</div>
+		);
+	}
 
 	const exportToCsv = () => {
 		const headers = ['DateTime', 'Type', 'Direction', 'Source', 'Destination', 'Name', 'Contact', 'Line', 'Duration', 'Price', 'Status'];
@@ -226,7 +392,12 @@ export default function Activity({ activity, loading, loadingMore, error, select
 									: { backgroundColor: 'var(--bg-secondary)', color: 'var(--accent)' };
 
 						return (
-							<div key={`call-${c.id}`} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors" style={{ borderBottomColor: 'var(--separator)', borderBottomWidth: '1px', borderBottomStyle: 'solid' }}>
+							<div
+								key={`call-${c.id}`}
+								onClick={() => setSelectedItem(c)}
+								className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors cursor-pointer hover:opacity-80"
+								style={{ borderBottomColor: 'var(--separator)', borderBottomWidth: '1px', borderBottomStyle: 'solid' }}
+							>
 								<div className="flex items-center gap-3 md:gap-4">
 									<div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0`} style={iconBg}>
 										{isMissed ? (
@@ -314,7 +485,7 @@ export default function Activity({ activity, loading, loadingMore, error, select
 									</div>
 									<div className="flex flex-col text-right">
 										<span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{formatDuration(c.length)}</span>
-										<span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{c.price} Kč</span>
+										<span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{formatPriceList(c.price)}</span>
 									</div>
 								</div>
 							</div>
@@ -323,7 +494,12 @@ export default function Activity({ activity, loading, loadingMore, error, select
 						// SMS item
 						const s = item; // OdorikSMS & { type: 'sms' }
 						return (
-							<div key={`sms-${s.id}`} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors" style={{ borderBottomColor: 'var(--separator)', borderBottomWidth: '1px', borderBottomStyle: 'solid' }}>
+							<div
+								key={`sms-${s.id}`}
+								onClick={() => setSelectedItem(s)}
+								className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors cursor-pointer hover:opacity-80"
+								style={{ borderBottomColor: 'var(--separator)', borderBottomWidth: '1px', borderBottomStyle: 'solid' }}
+							>
 								<div className="flex items-center gap-3 md:gap-4">
 									<div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--accent)' }}>
 										<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
@@ -403,7 +579,7 @@ export default function Activity({ activity, loading, loadingMore, error, select
 										<span className="font-medium" style={{ color: 'var(--text-primary)' }}>{lines.find(l => String(l.id) === String(s.line))?.name ?? s.line}</span>
 									</div>
 									<div className="flex flex-col text-right">
-										<span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{s.price} Kč</span>
+										<span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{formatPriceList(s.price)}</span>
 									</div>
 								</div>
 							</div>
@@ -422,6 +598,42 @@ export default function Activity({ activity, loading, loadingMore, error, select
 					{loadingMore ? t('common.loading') : t('activity.load_more')}
 				</button>
 			)}
+		{selectedItem && createPortal(
+			<div
+				className="fixed inset-0 z-50 flex items-center justify-center p-4"
+				style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+				onClick={() => setSelectedItem(null)}
+			>
+				<div
+					className="rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden"
+					style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px' }}
+					onClick={(e) => e.stopPropagation()}
+				>
+					<div className="p-4 flex justify-between items-center" style={{ borderBottom: '0.5px solid var(--separator)' }}>
+						<h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+							{selectedItem.type === 'call' ? (selectedItem as unknown as { destination_name?: string }).destination_name || translate('Call') : translate('SMS')}
+						</h3>
+						<button
+							onClick={() => setSelectedItem(null)}
+							className="p-2 rounded-full transition-colors"
+							style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}
+						>
+							<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+							</svg>
+						</button>
+					</div>
+					<div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 120px)' }}>
+						{selectedItem.type === 'call' ? (
+							<CallDetail item={selectedItem} lines={lines} translate={translate} t={t} balance={balance} />
+						) : (
+							<SmsDetail item={selectedItem} lines={lines} t={t} balance={balance} />
+						)}
+					</div>
+				</div>
+			</div>,
+			document.body
+		)}
 		</>
 	);
 }

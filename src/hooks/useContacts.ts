@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchContacts, addContact, editContact, deleteContact } from '../api';
+import { fetchContacts, addContact, editContact, deleteContact, readCache, writeCache, isCacheStale, isOffline, getCacheTTL } from '../api';
 import type { Contact, OdorikCredentials } from '../api';
 
 const AUTH_ERROR_PATTERNS = ['401', 'unauthorized', 'přihlášení', 'login', 'neplatné', 'invalid', 'auth'];
@@ -8,6 +8,8 @@ function isAuthError(message: string): boolean {
 	const lower = message.toLowerCase();
 	return AUTH_ERROR_PATTERNS.some(p => lower.includes(p));
 }
+
+const getContactsCacheKey = (creds: OdorikCredentials) => `contacts_${creds.user}`;
 
 export function useContacts(creds: OdorikCredentials | null, onAuthError?: () => void) {
 	const [contacts, setContacts] = useState<Contact[]>([]);
@@ -20,13 +22,40 @@ export function useContacts(creds: OdorikCredentials | null, onAuthError?: () =>
 		setLoading(true);
 		setError(null);
 
+		const cacheKey = getContactsCacheKey(creds);
+		
 		try {
+			const cached = await readCache<Contact[]>(cacheKey);
+			
+			// Use cache if valid and not forcing refresh
+			if (cached && !isCacheStale(cached, getCacheTTL('contacts'))) {
+				setContacts(cached.data);
+				setLoading(false);
+				
+				// Background refresh if online
+				if (!isOffline()) {
+					fetchContacts(creds).then(data => {
+						writeCache(cacheKey, { data, timestamp: Date.now() });
+						setContacts(data);
+					}).catch(() => {});
+				}
+				return;
+			}
+			
+			// Fetch fresh data
 			const data = await fetchContacts(creds);
+			await writeCache(cacheKey, { data, timestamp: Date.now() });
 			setContacts(data);
 		} catch (err) {
-			const message = err instanceof Error ? err.message : 'Failed to load contacts';
-			setError(message);
-			if (isAuthError(message)) onAuthError?.();
+			// Try to use stale cache on error
+			const cached = await readCache<Contact[]>(cacheKey);
+			if (cached?.data) {
+				setContacts(cached.data);
+			} else {
+				const message = err instanceof Error ? err.message : 'Failed to load contacts';
+				setError(message);
+				if (isAuthError(message)) onAuthError?.();
+			}
 		} finally {
 			setLoading(false);
 		}

@@ -18,7 +18,8 @@
   },
   "balance": {
     "credit": "Credito",
-    "refresh": "Aggiorna"
+    "refresh": "Aggiorna",
+    "remaining": "Saldo"
   },
   "settings": {
     "title": "Impostazioni",
@@ -35,6 +36,14 @@
     "clear_cache": "Cancella cache",
     "clear_cache_desc": "Cancella i dati salvati (cronologia, contatti), ma rimane connesso.",
     "clear_cache_confirm": "Vuoi davvero cancellare la cache?",
+    "cache_contacts": "Contatti",
+    "cache_activity": "Attività",
+    "cache_lines": "Linee / SIM",
+    "cache_ttl_1h": "1 ora",
+    "cache_ttl_6h": "6 ore",
+    "cache_ttl_1d": "1 giorno",
+    "cache_ttl_3d": "3 giorni",
+    "cache_ttl_7d": "7 giorni",
     "about": "Info",
     "version": "Odorik Dash",
     "aboutText": "Gestione contatti, chiamate e SMS per Odorik.cz",
@@ -100,7 +109,9 @@
     "missed": "Persa",
     "incoming": "In entrata",
     "outgoing": "In uscita",
-    "error_loading": "Errore nel caricamento delle chiamate"
+    "error_loading": "Errore nel caricamento delle chiamate",
+    "time": "Ora",
+    "price": "Prezzo"
   },
   "sms": {
     "received_title": "SMS ricevuti",

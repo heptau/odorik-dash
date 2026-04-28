@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchCallsAndSMS, loadFromCache, saveToCache, getCacheKey } from '../api';
+import { fetchCallsAndSMS, loadFromCache, saveToCache, getCacheKey, getCacheTTL } from '../api';
 import type { OdorikCredentials, ActivityItem } from '../api';
 
 export type FilterType = 'all' | 'calls' | 'sms';
@@ -18,7 +18,36 @@ export function useActivity(creds: OdorikCredentials | null) {
 		if (!creds) return;
 		setLoading(true);
 		setError(null);
+		
 		try {
+			// Try to load from cache first
+			if (cacheKey) {
+				const cached = await loadFromCache<ActivityItem>(cacheKey);
+				if (cached && cached.length > 0) {
+					setActivity(cached);
+					setLoading(false);
+					
+					// Background refresh if cache is stale
+					const isStale = !cached.find(c => {
+						const age = Date.now() - new Date(c.date).getTime();
+						return age < getCacheTTL('activity');
+					});
+					
+					if (isStale) {
+						const d = new Date();
+						d.setDate(d.getDate() - 30);
+						const fromDate = d.toISOString();
+						const toDate = new Date().toISOString();
+						fetchCallsAndSMS(creds, fromDate, toDate).then(({ activity: act }) => {
+							saveToCache(cacheKey, act);
+							setActivity(act);
+						}).catch(() => {});
+					}
+					return;
+				}
+			}
+			
+			// No cache, fetch fresh
 			const d = new Date();
 			d.setDate(d.getDate() - 30);
 			const fromDate = d.toISOString();
@@ -28,6 +57,15 @@ export function useActivity(creds: OdorikCredentials | null) {
 			setActivity(act);
 			if (cacheKey) saveToCache(cacheKey, act);
 		} catch (err) {
+			// Try stale cache on error
+			if (cacheKey) {
+				const cached = await loadFromCache<ActivityItem>(cacheKey);
+				if (cached && cached.length > 0) {
+					setActivity(cached);
+					setLoading(false);
+					return;
+				}
+			}
 			setError(err instanceof Error ? err.message : 'Failed to load activity');
 		} finally {
 			setLoading(false);

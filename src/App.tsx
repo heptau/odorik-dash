@@ -114,6 +114,7 @@ function App() {
 					lines={lines}
 					onLoadMore={loadMore}
 					contacts={contacts}
+					balance={{ amount: balance, currency: 'Kč' }}
 				/>
 			)}
 			{activeTab === 'callback' && <Callback creds={creds} />}
