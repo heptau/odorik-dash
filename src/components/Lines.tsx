@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import {
 	fetchLines,
 	fetchSimCards,
+	updateSimCard,
+	restartSimData,
 	unifyPhoneNo,
 	readCache,
 	writeCache,
@@ -9,10 +11,11 @@ import {
 	isOffline,
 	CACHE_TTL_1_DAY,
 } from '../api';
-import type { OdorikLine, OdorikSimCard, OdorikCredentials } from '../api';
+import type { OdorikLine, OdorikSimCard, OdorikCredentials, SimCardUpdateParams } from '../api';
 import { useT } from '../i18n';
 
 type LinesSimsCache = { lines: OdorikLine[]; simCards: OdorikSimCard[]; ts: number };
+type SelectedItem = { line: OdorikLine; sim: OdorikSimCard | undefined } | null;
 
 const formatBytes = (bytes: number): string => {
 	if (!bytes || bytes === 0) return '0 MB';
@@ -44,31 +47,6 @@ const formatLastUpdated = (ts: number): string => {
 	return new Date(ts).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 };
 
-const StatusBadge = ({ active, label }: { active?: string; label: string }) => {
-	const isActive = active != null && String(active).trim().toLowerCase() === 'true';
-	const green = '#22c55e';
-	const gray = '#6b7280';
-	return (
-		<div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider`} style={{
-			backgroundColor: isActive ? 'rgba(34, 197, 94, 0.15)' : 'rgba(107, 114, 128, 0.1)',
-			color: isActive ? green : gray
-		}}>
-			<div className={`w-1.5 h-1.5 rounded-full`} style={{ backgroundColor: isActive ? green : gray, boxShadow: isActive ? `0 0 6px ${green}` : 'none' }} />
-			{label}
-		</div>
-	);
-};
-
-const ToggleBadge = ({ active, label }: { active: boolean; label: string }) => (
-	<div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider`} style={{
-		backgroundColor: 'var(--bg-secondary)',
-		color: active ? 'var(--accent)' : 'var(--text-tertiary)'
-	}}>
-		<div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: active ? 'var(--accent)' : 'var(--text-tertiary)' }} />
-		{label}
-	</div>
-);
-
 const DataBar = ({ used, total, validFrom, validTo }: {
 	used: number; total: number; validFrom: string; validTo: string;
 }) => {
@@ -78,7 +56,7 @@ const DataBar = ({ used, total, validFrom, validTo }: {
 		new Date(iso).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'short' });
 	return (
 		<div>
-			<div className="flex justify-between items-baseline mb-1.5">
+			<div className="flex justify-between items-baseline mb-1">
 				<span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
 					{formatBytes(used)} <span className="font-normal" style={{ color: 'var(--text-tertiary)' }}>/ {formatBytes(total)}</span>
 				</span>
@@ -97,163 +75,257 @@ const DataBar = ({ used, total, validFrom, validTo }: {
 	);
 };
 
-interface LineCardProps {
-	line: OdorikLine;
-	sim: OdorikSimCard | undefined;
-	visiblePasswords: Set<string>;
-	onTogglePassword: (id: string) => void;
-	t: ReturnType<typeof useT>;
-}
+const SettingRow = ({ label, value }: { label: string; value: string | React.ReactNode }) => (
+	<div className="flex justify-between items-center py-2" style={{ borderBottomColor: 'var(--separator)', borderBottomWidth: '0.5px' }}>
+		<span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-tertiary)' }}>{label}</span>
+		{typeof value === 'string' ? (
+			<span className="text-sm" style={{ color: 'var(--text-primary)' }}>{value}</span>
+		) : value}
+	</div>
+);
 
-const LineCard = ({ line, sim, visiblePasswords, onTogglePassword, t }: LineCardProps) => {
-	const [copiedSimLocal, setCopiedSimLocal] = useState<number | null>(null);
-
-	const copySimNumber = async (sim: OdorikSimCard) => {
-		await navigator.clipboard.writeText(sim.sim_number);
-		setCopiedSimLocal(sim.id);
-		setTimeout(() => setCopiedSimLocal(null), 2000);
-	};
-
+const DualToggleRow = ({
+	label,
+	currentValue,
+	nextValue,
+	onToggleCurrent,
+	onToggleNext,
+	disabled,
+}: {
+	label: string;
+	currentValue: boolean;
+	nextValue?: boolean;
+	onToggleCurrent: () => void;
+	onToggleNext: () => void;
+	disabled?: boolean;
+}) => {
+	const hasChange = nextValue !== undefined && nextValue !== currentValue;
 	return (
-		<div className="rounded-2xl overflow-hidden flex flex-col group" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px' }}>
-			<div className="p-5 flex justify-between items-start gap-4" style={{ borderBottomColor: 'var(--separator)', borderBottomWidth: sim ? '0.5px' : '0' }}>
-				<div className="min-w-0">
-					<h3 className="text-2xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>{line.name}</h3>
-					<p className="text-xs font-medium mt-0.5" style={{ color: 'var(--text-tertiary)' }}>ID {line.id}</p>
-					{line.caller_id && (
-						<p className="text-sm font-semibold mt-2" style={{ color: 'var(--text-secondary)' }}>
-							{unifyPhoneNo(line.caller_id)}
-						</p>
-					)}
-				</div>
-				<div className="shrink-0 flex flex-col items-end gap-2">
-					<StatusBadge active={line.active_sip} label="SIP" />
-					<StatusBadge active={line.active_ping} label="Ping" />
-				</div>
-			</div>
-
-			{sim && (
-				<div className="p-5" style={{ borderBottomColor: 'var(--separator)', borderBottomWidth: '0.5px' }}>
-					<div className="flex justify-between items-start mb-3">
-						<div>
-							<p className="text-lg font-black tabular-nums" style={{ color: 'var(--text-primary)' }}>
-								{unifyPhoneNo(sim.phone_number)}
-							</p>
-							<p className="text-[10px] font-medium" style={{ color: 'var(--text-tertiary)' }}>SIM karta</p>
-						</div>
-						<span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold`} style={{
-							backgroundColor: 'var(--bg-secondary)',
-							color: sim.state === 'active' ? 'var(--success)' : 'var(--destructive)'
-						}}>
-							<span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sim.state === 'active' ? 'var(--success)' : 'var(--destructive)' }} />
-							{sim.state === 'active' ? 'Aktivní' : 'Pozastavena'}
-						</span>
-					</div>
-
-					{sim.data_bought_total > 0 && (
-						<div className="mb-3">
-							<DataBar
-								used={sim.data_used}
-								total={sim.data_bought_total}
-								validFrom={sim.data_package_valid_from}
-								validTo={sim.data_package_valid_to}
-							/>
-						</div>
-					)}
-
-					<div className="grid grid-cols-2 gap-2 mb-3">
-						<div className="p-2 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-							<p className="text-[9px] font-black uppercase tracking-widest mb-0.5" style={{ color: 'var(--text-tertiary)' }}>Data</p>
-							<p className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>{formatPackageName(sim.data_package)}</p>
-						</div>
-						<div className="p-2 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-							<p className="text-[9px] font-black uppercase tracking-widest mb-0.5" style={{ color: 'var(--text-tertiary)' }}>Hlas</p>
-							<p className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>{formatPackageName(sim.voice_package)}</p>
-						</div>
-					</div>
-
-					<div className="flex flex-wrap gap-1.5">
-						<ToggleBadge active={sim.mobile_data} label="Data" />
-						<ToggleBadge active={sim.lte} label="LTE" />
-						<ToggleBadge active={sim.missed_calls_register} label="Zmeškané" />
-						{sim.roaming !== 'off' && sim.roaming !== 'unknown' && (
-							<ToggleBadge active={true} label={`Roaming: ${roamingLabel(sim.roaming)}`} />
-						)}
-					</div>
-
-					<div className="mt-3" style={{ borderTopColor: 'var(--separator)', borderTopWidth: '0.5px' }}>
-						<p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>ICCID</p>
-						<button
-							onClick={() => copySimNumber(sim)}
-							className="w-full flex items-center justify-between hover:opacity-90 active:scale-[0.99] transition-all px-2.5 py-2 rounded-xl group"
-							style={{ backgroundColor: 'var(--bg-secondary)' }}
-						>
-							<span className="font-mono text-xs tracking-wider truncate" style={{ color: 'var(--text-secondary)' }}>
-								{sim.sim_number}
-							</span>
-							<span className="shrink-0 ml-2">
-								{copiedSimLocal === sim.id ? (
-									<svg className="w-4 h-4" style={{ color: 'var(--success)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-									</svg>
-								) : (
-									<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-tertiary)' }}>
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" />
-									</svg>
-								)}
-							</span>
-						</button>
-					</div>
-				</div>
-			)}
-
-			<div className="p-5 space-y-3">
-				{line.sip_password && (
-					<div className="flex items-center justify-between">
-						<span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-tertiary)' }}>SIP heslo</span>
-						<button
-							onClick={() => onTogglePassword(line.id)}
-							className="flex items-center gap-2 font-mono text-sm hover:opacity-70 transition-opacity"
-							style={{ color: 'var(--text-primary)' }}
-						>
-							{visiblePasswords.has(line.id) ? line.sip_password : '•'.repeat(Math.min(line.sip_password.length, 12))}
-							<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								{visiblePasswords.has(line.id) ? (
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-								) : (
-									<><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></>
-								)}
-							</svg>
-						</button>
-					</div>
-				)}
-				{line.public_name && (
-					<div className="flex items-center justify-between">
-						<span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-tertiary)' }}>{t('lines.public_name')}</span>
-						<span className="text-sm" style={{ color: 'var(--text-primary)' }}>{line.public_name}</span>
-					</div>
-				)}
-				{line.backup_number && (
-					<div className="flex items-center justify-between">
-						<span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-tertiary)' }}>{t('lines.backup_number')}</span>
-						<span className="text-sm" style={{ color: 'var(--text-primary)' }}>{unifyPhoneNo(line.backup_number)}</span>
-					</div>
-				)}
-				<div className="flex items-center justify-between">
-					<span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-tertiary)' }}>{t('lines.forwarding')}</span>
-					<div className="flex gap-2">
-						<StatusBadge active={line.active_iax} label="IAX" />
-						<StatusBadge active={line.active_sip} label="SIP" />
-					</div>
-				</div>
-				<div className="flex items-center justify-between">
-					<span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-tertiary)' }}>{t('lines.callback')}</span>
-					<StatusBadge active={line.active_pin} label="PIN" />
+		<div className="flex items-center justify-between py-3" style={{ borderBottomColor: 'var(--separator)', borderBottomWidth: '0.5px' }}>
+			<div>
+				<p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{label}</p>
+				<div className="flex gap-2 mt-1">
+					<button
+						onClick={onToggleCurrent}
+						disabled={disabled}
+						className={`text-[10px] px-2 py-0.5 rounded-full transition-colors ${currentValue ? 'bg-green-500/20 text-green-600' : 'bg-gray-500/20 text-gray-500'} ${disabled ? 'opacity-40' : 'hover:opacity-80'}`}
+					>
+						{currentValue ? 'Zap' : 'Vyp'} teď
+					</button>
+					<button
+						onClick={onToggleNext}
+						disabled={disabled}
+						className={`text-[10px] px-2 py-0.5 rounded-full transition-colors ${hasChange ? 'bg-amber-500/20 text-amber-600' : 'bg-gray-500/20 text-gray-500'} ${disabled ? 'opacity-40' : 'hover:opacity-80'}`}
+					>
+						{nextValue !== undefined ? (nextValue ? 'Zap' : 'Vyp') : '---'} další
+					</button>
 				</div>
 			</div>
 		</div>
 	);
 };
+
+function SimDetailModal({
+	item,
+	onClose,
+	onUpdate,
+	onRestart,
+	onRefresh,
+}: {
+	item: { line: OdorikLine; sim: OdorikSimCard | undefined };
+	onClose: () => void;
+	onUpdate: (phoneNumber: string, params: SimCardUpdateParams) => Promise<void>;
+	onRestart: (phoneNumber: string) => Promise<void>;
+	onRefresh: () => Promise<void>;
+}) {
+	const { line, sim } = item;
+	const [localSim, setLocalSim] = useState<OdorikSimCard | undefined>(sim);
+	const [saving, setSaving] = useState(false);
+
+	useEffect(() => {
+		setLocalSim(sim);
+	}, [sim]);
+
+	const hasChangesInProgress = localSim && localSim.changes_in_progress && localSim.changes_in_progress.length > 0;
+
+	const handleToggleCurrent = async (key: 'mobile_data' | 'lte' | 'missed_calls_register', value: boolean) => {
+		if (!localSim || hasChangesInProgress) return;
+		setSaving(true);
+		try {
+			await onUpdate(localSim.phone_number, { [key]: value });
+			await onRefresh();
+		} catch (err) {
+			console.error('handleChange error:', err);
+		} finally {
+			setSaving(false);
+		}
+	};
+
+	const handleToggleNext = async (key: 'mobile_data' | 'lte' | 'missed_calls_register', value: boolean) => {
+		if (!localSim) return;
+		setSaving(true);
+		try {
+			const nextMonthKey = `requested_${key}_for_next_month` as 'requested_lte_for_next_month' | 'requested_mobile_data_for_next_month' | 'requested_missed_calls_register_for_next_month';
+			await onUpdate(localSim.phone_number, { [nextMonthKey]: value });
+			await onRefresh();
+		} catch (err) {
+			console.error('handleChange error:', err);
+		} finally {
+			setSaving(false);
+		}
+	};
+
+	const handleRestart = async () => {
+		if (!localSim) return;
+		setSaving(true);
+		try {
+			await onRestart(localSim.phone_number);
+			await onRefresh();
+		} catch (err) {
+			console.error('handleRestart error:', err);
+		} finally {
+			setSaving(false);
+		}
+	};
+
+	const canRestart = localSim && localSim.data_bought_total > 0 && !localSim.data_package.startsWith('perKB');
+
+	return (
+		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+			<div className="absolute inset-0 bg-black/50" onClick={onClose} />
+			<div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl" style={{ backgroundColor: 'var(--surface)' }}>
+				<div className="sticky top-0 p-5 flex justify-between items-center" style={{ backgroundColor: 'var(--surface)', borderBottomColor: 'var(--separator)', borderBottomWidth: '0.5px' }}>
+					<div>
+						<h2 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{line.name}</h2>
+						<p className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>ID {line.id}</p>
+					</div>
+					<button onClick={onClose} className="p-2 rounded-xl hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+						<svg className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					</button>
+				</div>
+
+				<div className="p-5 space-y-5">
+					<div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+						<p className="text-xs font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Telefonní číslo</p>
+						<p className="text-lg font-bold tabular-nums" style={{ color: 'var(--text-primary)' }}>
+							{localSim ? unifyPhoneNo(localSim.phone_number) : unifyPhoneNo(line.caller_id || '')}
+						</p>
+					</div>
+
+					{localSim && (
+						<>
+							{hasChangesInProgress && (
+								<div className="p-3 rounded-xl flex items-center gap-2 text-sm" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', borderColor: 'var(--separator)', borderWidth: '1px' }}>
+									<svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+									</svg>
+									<span style={{ color: 'var(--accent)' }}>Probíhá změna nastavení...</span>
+								</div>
+							)}
+
+							<div className="grid grid-cols-2 gap-3">
+								<div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+									<p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Stav</p>
+									<p className="text-sm font-bold" style={{ color: localSim.state === 'active' ? 'var(--success)' : 'var(--destructive)' }}>
+										{localSim.state === 'active' ? 'Aktivní' : 'Pozastavena'}
+									</p>
+								</div>
+								<div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+									<p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Roaming</p>
+									<p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{roamingLabel(localSim.roaming)}</p>
+								</div>
+							</div>
+
+							<div className="grid grid-cols-2 gap-3">
+								<div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+									<p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Data teď</p>
+									<p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{formatPackageName(localSim.data_package)}</p>
+								</div>
+								<div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+									<p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Data další</p>
+									<p className="text-sm font-bold" style={{ color: localSim.data_package_for_next_month !== localSim.data_package ? 'var(--accent)' : 'var(--text-primary)' }}>
+										{formatPackageName(localSim.data_package_for_next_month)}
+									</p>
+								</div>
+								<div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+									<p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Hlas teď</p>
+									<p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{formatPackageName(localSim.voice_package)}</p>
+								</div>
+								<div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+									<p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Hlas další</p>
+									<p className="text-sm font-bold" style={{ color: localSim.voice_package_for_next_month !== localSim.voice_package ? 'var(--accent)' : 'var(--text-primary)' }}>
+										{formatPackageName(localSim.voice_package_for_next_month)}
+									</p>
+								</div>
+							</div>
+
+							{localSim.data_bought_total > 0 && (
+								<div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+									<DataBar
+										used={localSim.data_used}
+										total={localSim.data_bought_total}
+										validFrom={localSim.data_package_valid_from}
+										validTo={localSim.data_package_valid_to}
+									/>
+									{canRestart && (
+										<button
+											onClick={handleRestart}
+											disabled={saving}
+											className="mt-3 w-full py-2 rounded-lg text-sm font-bold hover:opacity-90 active:scale-[0.99] transition-all"
+											style={{ backgroundColor: 'var(--accent)', color: 'white' }}
+										>
+											{saving ? '...' : 'Restart dat'}
+										</button>
+									)}
+								</div>
+							)}
+
+							<div className="space-y-1">
+								<DualToggleRow
+									label="Mobilní data"
+									currentValue={localSim.mobile_data}
+									onToggleCurrent={() => handleToggleCurrent('mobile_data', !localSim.mobile_data)}
+									onToggleNext={() => handleToggleNext('mobile_data', !localSim.mobile_data)}
+									disabled={saving}
+								/>
+								<DualToggleRow
+									label="LTE"
+									currentValue={localSim.lte}
+									onToggleCurrent={() => handleToggleCurrent('lte', !localSim.lte)}
+									onToggleNext={() => handleToggleNext('lte', !localSim.lte)}
+									disabled={saving}
+								/>
+								<DualToggleRow
+									label="Zmeškané hovory"
+									currentValue={localSim.missed_calls_register}
+									onToggleCurrent={() => handleToggleCurrent('missed_calls_register', !localSim.missed_calls_register)}
+									onToggleNext={() => handleToggleNext('missed_calls_register', !localSim.missed_calls_register)}
+									disabled={saving}
+								/>
+							</div>
+
+							<div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+								<p className="text-[9px] font-black uppercase tracking-widest mb-2" style={{ color: 'var(--text-tertiary)' }}>ICCID</p>
+								<p className="font-mono text-xs tracking-wider break-all" style={{ color: 'var(--text-secondary)' }}>
+									{localSim.sim_number}
+								</p>
+							</div>
+						</>
+					)}
+
+					<div className="space-y-2 pt-2" style={{ borderTopColor: 'var(--separator)', borderTopWidth: '1px' }}>
+						<SettingRow label="SIP" value={line.active_sip === 'true' ? 'Aktivní' : 'Neaktivní'} />
+						{line.caller_id && <SettingRow label="Číslo" value={unifyPhoneNo(line.caller_id)} />}
+						{line.public_name && <SettingRow label="Veřejné jméno" value={line.public_name} />}
+						{line.backup_number && <SettingRow label="Záložní číslo" value={unifyPhoneNo(line.backup_number)} />}
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
 
 export default function Lines({ creds }: { creds: OdorikCredentials }) {
 	const [lines, setLines] = useState<OdorikLine[]>([]);
@@ -261,20 +333,10 @@ export default function Lines({ creds }: { creds: OdorikCredentials }) {
 	const [lastUpdated, setLastUpdated] = useState<number | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
-	const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(new Set());
+	const [selected, setSelected] = useState<SelectedItem>(null);
 	const t = useT();
 
-	const togglePassword = (lineId: string) => {
-		setVisiblePasswords(prev => {
-			const next = new Set(prev);
-			if (next.has(lineId)) {
-				next.delete(lineId);
-			} else {
-				next.add(lineId);
-			}
-			return next;
-		});
-	};
+	const getLinesCacheKey = (creds: OdorikCredentials): string => `odorik_lines_sims_${creds.user}`;
 
 	const fetchAndCache = async (showSpinner = true) => {
 		if (isOffline()) return;
@@ -298,7 +360,25 @@ export default function Lines({ creds }: { creds: OdorikCredentials }) {
 		}
 	};
 
-	const getLinesCacheKey = (_creds: OdorikCredentials): string => `odorik_lines_sims_${creds.user}`;
+	const handleSimUpdate = async (phoneNumber: string, params: SimCardUpdateParams) => {
+		try {
+			await updateSimCard(creds, phoneNumber, params);
+			await fetchAndCache(false);
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : t('lines.error_loading');
+			setError(msg);
+		}
+	};
+
+	const handleSimRestart = async (phoneNumber: string) => {
+		try {
+			await restartSimData(creds, phoneNumber);
+			await fetchAndCache(false);
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : t('lines.error_loading');
+			setError(msg);
+		}
+	};
 
 	useEffect(() => {
 		const loadCache = async () => {
@@ -323,6 +403,10 @@ export default function Lines({ creds }: { creds: OdorikCredentials }) {
 		return simCards.find(sim => sim.line === Number(lineId));
 	};
 
+	const handleSelect = (line: OdorikLine) => {
+		setSelected({ line, sim: getSimForLine(line.id) });
+	};
+
 	if (loading && lines.length === 0) {
 		return (
 			<div className="space-y-6 animate-in fade-in duration-500">
@@ -332,9 +416,9 @@ export default function Lines({ creds }: { creds: OdorikCredentials }) {
 						<p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{t('common.loading')}</p>
 					</div>
 				</div>
-				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 					{Array.from({ length: 4 }).map((_, i) => (
-						<div key={i} className="p-5 rounded-2xl h-72 animate-pulse" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px' }} />
+						<div key={i} className="p-4 rounded-2xl h-48 animate-pulse" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px' }} />
 					))}
 				</div>
 			</div>
@@ -392,18 +476,98 @@ export default function Lines({ creds }: { creds: OdorikCredentials }) {
 				</div>
 			)}
 
-			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
-				{lines.map(line => (
-					<LineCard
-						key={line.id}
-						line={line}
-						sim={getSimForLine(line.id)}
-						visiblePasswords={visiblePasswords}
-						onTogglePassword={togglePassword}
-						t={t}
-					/>
-				))}
+			<div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pb-8">
+				{lines.map(line => {
+					const sim = getSimForLine(line.id);
+					const hasChanges = sim && sim.changes_in_progress && sim.changes_in_progress.length > 0;
+
+					return (
+						<button
+							key={line.id}
+							onClick={() => handleSelect(line)}
+							className="text-left p-4 rounded-2xl hover:opacity-90 active:scale-[0.99] transition-all"
+							style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px' }}
+						>
+							<div className="flex justify-between items-start mb-3">
+								<div className="min-w-0">
+									<h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{line.name}</h3>
+									<p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>ID {line.id}</p>
+									{line.caller_id && (
+										<p className="text-sm font-semibold mt-1" style={{ color: 'var(--text-secondary)' }}>
+											{unifyPhoneNo(line.caller_id)}
+										</p>
+									)}
+								</div>
+								<div className="shrink-0 flex flex-col items-end gap-1">
+									<span className="text-[10px] font-bold" style={{ color: line.active_sip === 'true' ? 'var(--success)' : 'var(--text-tertiary)' }}>
+										{line.active_sip === 'true' ? 'SIP ✓' : 'SIP ✗'}
+									</span>
+									{sim && (
+										<span className="text-[10px] font-medium" style={{ color: sim.state === 'active' ? 'var(--success)' : 'var(--destructive)' }}>
+											{sim.state === 'active' ? 'Aktivní' : 'Pozastavena'}
+										</span>
+									)}
+									{hasChanges && (
+										<span className="text-[10px] font-medium text-amber-600">Změna...</span>
+									)}
+								</div>
+							</div>
+
+							{sim && sim.data_bought_total > 0 && (
+								<div className="mb-3">
+									<DataBar
+										used={sim.data_used}
+										total={sim.data_bought_total}
+										validFrom={sim.data_package_valid_from}
+										validTo={sim.data_package_valid_to}
+									/>
+								</div>
+							)}
+
+							{sim && (
+								<div className="grid grid-cols-3 gap-2 text-xs mb-2">
+									<div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+										<p className="text-[9px] uppercase" style={{ color: 'var(--text-tertiary)' }}>Data</p>
+										<p className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{formatPackageName(sim.data_package)}</p>
+									</div>
+									<div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+										<p className="text-[9px] uppercase" style={{ color: 'var(--text-tertiary)' }}>Hlas</p>
+										<p className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{formatPackageName(sim.voice_package)}</p>
+									</div>
+									<div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+										<p className="text-[9px] uppercase" style={{ color: 'var(--text-tertiary)' }}>Roaming</p>
+										<p className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{roamingLabel(sim.roaming)}</p>
+									</div>
+								</div>
+							)}
+
+							{sim && (
+								<div className="flex flex-wrap gap-1.5">
+									<span className={`text-[10px] px-2 py-0.5 rounded-full ${sim.mobile_data ? 'bg-green-500/20 text-green-600' : 'bg-gray-500/20 text-gray-500'}`}>
+										{sim.mobile_data ? 'Data ✓' : 'Data ✗'}
+									</span>
+									<span className={`text-[10px] px-2 py-0.5 rounded-full ${sim.lte ? 'bg-green-500/20 text-green-600' : 'bg-gray-500/20 text-gray-500'}`}>
+										LTE {sim.lte ? '✓' : '✗'}
+									</span>
+									<span className={`text-[10px] px-2 py-0.5 rounded-full ${sim.missed_calls_register ? 'bg-green-500/20 text-green-600' : 'bg-gray-500/20 text-gray-500'}`}>
+										{sim.missed_calls_register ? 'Zmeškané ✓' : 'Zmeškané ✗'}
+									</span>
+								</div>
+							)}
+						</button>
+					);
+				})}
 			</div>
+
+			{selected && (
+				<SimDetailModal
+					item={selected}
+					onClose={() => setSelected(null)}
+					onUpdate={handleSimUpdate}
+					onRestart={handleSimRestart}
+					onRefresh={() => fetchAndCache(false)}
+				/>
+			)}
 		</div>
 	);
 }

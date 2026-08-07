@@ -26,6 +26,7 @@ help:
 build:
 	npm run build
 	mkdir -p docs/locales && cp src/i18n/locales/*.json docs/locales/
+	mkdir -p docs/.well-known && cp src/.well-known/security.txt docs/.well-known/
 	cp src/CNAME docs/CNAME
 
 start:

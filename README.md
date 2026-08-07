@@ -1,5 +1,9 @@
 # Odorik Dash - Progressive Web App
 
+[![GitHub License](https://img.shields.io/github/license/heptau/pgarachne?label=License)](LICENSE)
+[![Tests](https://img.shields.io/badge/Tests-44%20passed-brightgreen)](https://github.com/heptau/odorik-dash/actions)
+[![PWA](https://img.shields.io/badge/PWA-Installable-blue?logo=pwa)](https://odorik-dash.80.cz)
+
 Modern web application for managing Odorik.cz services (calls, SMS, contacts, credits, SIM cards...).
 
 ### Features
@@ -50,6 +54,22 @@ src/
 npm run build
 # Output is in docs/ - ready for GitHub Pages
 ```
+
+### UI Indicators
+
+**Status Badges** (in Lines/SIM cards view):
+- `Data` / `LTE` / `Zmeškané` - Toggle status showing current settings
+- Green badge = enabled, gray = disabled
+- Amber badge (in detail) = change queued for next month
+
+**SIM States**:
+- Aktivní (green) = SIM is active
+- Pozastavena (red) = SIM is suspended
+- Změna... (amber) = change in progress
+
+**Data Usage**:
+- Progress bar shows current month consumption
+- Color: green (<70%), orange (70-90%), red (>90%)
 
 ### Development
 

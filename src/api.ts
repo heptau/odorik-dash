@@ -397,6 +397,16 @@ export interface OdorikLine {
   incoming_call_number_format?: string;
 }
 
+export interface DataPackage {
+  name: string;
+  price: number;
+}
+
+export interface RoamingSetting {
+  name: string;
+  price: number;
+}
+
 export interface OdorikSimCard {
   id: number;
   line: number;
@@ -406,8 +416,8 @@ export interface OdorikSimCard {
   changes_in_progress: string[];
   data_package: string;
   data_package_for_next_month: string;
-  data_bought_total: number;   // bytes
-  data_used: number;           // bytes
+  data_bought_total: number;
+  data_used: number;
   data_package_valid_from: string;
   data_package_valid_to: string;
   voice_package: string;
@@ -420,6 +430,8 @@ export interface OdorikSimCard {
   lte_for_next_month: boolean;
   roaming: string;
   premium_services: string;
+  available_data_packages?: DataPackage[];
+  available_roaming_settings?: RoamingSetting[];
 }
 
 export const fetchSimCards = async (creds: OdorikCredentials, options?: RetryOptions): Promise<OdorikSimCard[]> => {
@@ -429,6 +441,71 @@ export const fetchSimCards = async (creds: OdorikCredentials, options?: RetryOpt
     const data = await response.json();
     if (data && data.errors) throw new Error(data.errors.join(', '));
     return data as OdorikSimCard[];
+  }, options);
+};
+
+export interface SimCardUpdateParams {
+  state?: 'active' | 'suspended';
+  data_package?: string;
+  data_package_for_next_month?: string;
+  voice_package?: string;
+  voice_package_for_next_month?: string;
+  package_delayed_billing?: string;
+  package_delayed_billing_for_next_month?: string;
+  missed_calls_register?: boolean;
+  mobile_data?: boolean;
+  lte?: boolean;
+  lte_for_next_month?: boolean;
+  roaming?: string;
+  premium_services?: 'off' | 'sms_payments_and_dms' | 'all_other_than_sms_payments_and_dms' | 'all';
+  requested_lte_for_next_month?: boolean;
+  requested_mobile_data_for_next_month?: boolean;
+  requested_missed_calls_register_for_next_month?: boolean;
+}
+
+export const updateSimCard = async (
+  creds: OdorikCredentials,
+  phoneNumber: string,
+  params: SimCardUpdateParams,
+  options?: RetryOptions
+): Promise<{ success: boolean }> => {
+  return withRetry(async () => {
+    const urlParams = new URLSearchParams({ user: creds.user, password: creds.pass, phone_number: phoneNumber });
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== undefined) urlParams.append(key, String(value));
+    }
+    console.log('updateSimCard request:', `https://www.odorik.cz/api/v1/sim_cards/${phoneNumber}.json`, Object.fromEntries(urlParams));
+    const response = await fetch(`https://www.odorik.cz/api/v1/sim_cards/${phoneNumber}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: urlParams,
+    });
+    console.log('updateSimCard response status:', response.status);
+    const text = await response.text();
+    console.log('updateSimCard response:', text);
+    if (!response.ok) throw new Error(text || `HTTP ${response.status}`);
+    const data = text ? JSON.parse(text) : {};
+    if (data && data.errors) throw new Error(data.errors.join(', '));
+    return { success: true };
+  }, options);
+};
+
+export const restartSimData = async (
+  creds: OdorikCredentials,
+  phoneNumber: string,
+  options?: RetryOptions
+): Promise<{ success: boolean }> => {
+  return withRetry(async () => {
+    const params = new URLSearchParams({ user: creds.user, password: creds.pass });
+    const response = await fetch(`https://www.odorik.cz/api/v1/sim_cards/${phoneNumber}/data_restart`, {
+      method: 'POST',
+      body: params,
+    });
+    const text = await response.text();
+    if (!response.ok || text.toLowerCase().startsWith('error')) {
+      throw new Error(text || 'Chyba při restartu dat');
+    }
+    return { success: true };
   }, options);
 };
 
@@ -631,7 +708,9 @@ export const getCacheTTL = (key: 'contacts' | 'activity' | 'lines'): number => {
 			const parsed = JSON.parse(stored);
 			return parsed[key] || CACHE_TTL_1_DAY;
 		}
-	} catch {}
+	} catch {
+		// ignore parse error
+	}
 	return CACHE_TTL_1_DAY;
 };
 
