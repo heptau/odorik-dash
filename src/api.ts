@@ -144,7 +144,10 @@ export const unifyPhoneNo = (raw: string): string => {
 };
 
 // Parsed representation of an Odorik contact name.
-// Odorik stores names as: "First <b>Last</b> <i>note</i>"
+// Odorik stores names as one plain-text field. Legacy contacts mark surname/note
+// with visible <b>/<i> tags, which show up literally wherever the string isn't
+// rendered as HTML (phones, other apps). New contacts use invisible zero-width
+// markers instead, so the raw string still reads as plain "First Last note".
 export interface ParsedContactName {
 	name: string;
 	surname: string;
@@ -153,15 +156,41 @@ export interface ParsedContactName {
 	displayName: string;
 }
 
-// Parse contact name components from Odorik's HTML-like format:
-// "Jan <b>Novak</b> <i>poznamka</i>" -> { name: "Jan", surname: "Novak", note: "poznamka", displayName: "Jan Novak" }
+// Zero-width marker characters used to delimit surname/note in newly saved names.
+// They contribute no visible glyph or width, so "Jan⁣Novak ⁤note" still
+// displays as the plain "Jan Novak note".
+export const SURNAME_MARKER = '⁣'; // INVISIBLE SEPARATOR
+export const NOTE_MARKER = '⁤'; // INVISIBLE PLUS
+
+// Build the fullname string sent to Odorik from separate fields, using the
+// invisible marker format (see SURNAME_MARKER/NOTE_MARKER above).
+export const buildContactName = (name: string, surname: string, note: string): string => {
+	const parts = [name.trim()];
+	if (surname.trim()) parts.push(SURNAME_MARKER + surname.trim());
+	if (note.trim()) parts.push(NOTE_MARKER + note.trim());
+	return parts.join(' ').trim();
+};
+
+// Parse contact name components, supporting both the current invisible-marker
+// format and the legacy <b>/<i> tag format for contacts saved before this change:
+// "Jan ⁣Novak ⁤poznamka" or "Jan <b>Novak</b> <i>poznamka</i>"
+// -> { name: "Jan", surname: "Novak", note: "poznamka", displayName: "Jan Novak" }
 export const parseContactName = (fullname: string): ParsedContactName => {
-	const nameMatch = fullname.match(/^([^<]*)/);
-	const surnameMatch = fullname.match(/<b>(.*?)<\/b>/);
-	const noteMatch = fullname.match(/<i>(.*?)<\/i>/);
+	const hasMarkers = fullname.includes(SURNAME_MARKER) || fullname.includes(NOTE_MARKER);
+
+	const nameMatch = hasMarkers
+		? fullname.match(new RegExp(`^([^${SURNAME_MARKER}${NOTE_MARKER}]*)`))
+		: fullname.match(/^([^<]*)/);
+	const surnameMatch = hasMarkers
+		? fullname.match(new RegExp(`${SURNAME_MARKER}([^${NOTE_MARKER}]*)`))
+		: fullname.match(/<b>(.*?)<\/b>/);
+	const noteMatch = hasMarkers
+		? fullname.match(new RegExp(`${NOTE_MARKER}(.*)$`))
+		: fullname.match(/<i>(.*?)<\/i>/);
+
 	const name = nameMatch ? nameMatch[1].trim() : '';
-	const surname = surnameMatch ? surnameMatch[1] : '';
-	const note = noteMatch ? noteMatch[1] : '';
+	const surname = surnameMatch ? surnameMatch[1].trim() : '';
+	const note = noteMatch ? noteMatch[1].trim() : '';
 	const displayName = [name, surname].filter(Boolean).join(' ');
 	return { name, surname, note, displayName };
 };

@@ -155,6 +155,18 @@ const toDate = new Date().toISOString();
 - This file should be updated after any significant change in architecture, security, routing, configuration, or documentation
 - Don't wait for a special request - if the update is clearly relevant, make it automatically
 
+## CHANGELOG.md Maintenance Rule
+- **Every code change must be recorded in `CHANGELOG.md`**, under `[Unreleased]`, in the correct
+  Keep a Changelog section (`Added`/`Changed`/`Fixed`/`Security`/...).
+- The `[Unreleased]` section must reflect the net diff since the last released version, not a
+  log of every edit made while getting there. If a change under `[Unreleased]` gets corrected,
+  reworked, or redone (e.g. the user isn't happy with the first attempt, or it was buggy), **edit
+  the existing entry in place** to describe the final behavior — don't append a second entry for
+  the same change.
+- Only once a version is actually released (new `## [x.y.z] - date` heading cut) does the
+  `[Unreleased]` content become frozen history; before that point, entries under `[Unreleased]`
+  are living text, not an append-only log.
+
 ## Known Issues / TODOs
 - ESLint warnings for missing dependencies in useEffect (common React hooks patterns)
 - CSS lightningcss warnings for opacity values (does not affect functionality)

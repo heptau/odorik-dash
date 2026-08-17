@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { splitPhoneNo, unifyPhoneNo, parseContactName, lookupContact, isInternalPhone, lookupLineByNumber, lookupLineById, lookupContactOrLine } from './api';
+import { splitPhoneNo, unifyPhoneNo, parseContactName, buildContactName, lookupContact, isInternalPhone, lookupLineByNumber, lookupLineById, lookupContactOrLine } from './api';
 
 describe('splitPhoneNo', () => {
   it('should split Czech phone number with +420 prefix', () => {
@@ -81,6 +81,43 @@ describe('parseContactName', () => {
       note: '',
       displayName: '',
     });
+  });
+
+  it('should parse name built with invisible markers (surname only)', () => {
+    const result = parseContactName(buildContactName('Jan', 'Novak', ''));
+    expect(result).toEqual({
+      name: 'Jan',
+      surname: 'Novak',
+      note: '',
+      displayName: 'Jan Novak',
+    });
+  });
+
+  it('should parse name built with invisible markers (surname and note)', () => {
+    const result = parseContactName(buildContactName('Jan', 'Novak', 'poznamka'));
+    expect(result).toEqual({
+      name: 'Jan',
+      surname: 'Novak',
+      note: 'poznamka',
+      displayName: 'Jan Novak',
+    });
+  });
+
+  it('should parse name built with invisible markers (note only)', () => {
+    const result = parseContactName(buildContactName('Jan', '', 'poznamka'));
+    expect(result).toEqual({
+      name: 'Jan',
+      surname: '',
+      note: 'poznamka',
+      displayName: 'Jan',
+    });
+  });
+});
+
+describe('buildContactName', () => {
+  it('should not contain HTML tags', () => {
+    const fullname = buildContactName('Jan', 'Novak', 'poznamka');
+    expect(fullname).not.toMatch(/[<>]/);
   });
 });
 

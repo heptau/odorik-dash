@@ -7,7 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Contact name/surname/note (company) are no longer joined with visible `<b>`/`<i>` HTML tags in
+  the string stored via the Odorik API. They're now delimited with invisible zero-width marker
+  characters instead, so the raw name still reads as plain text (no literal tags) anywhere it's
+  shown without HTML rendering — on the phone, in other apps, or on the Odorik website itself.
+  Existing contacts saved with the old `<b>`/`<i>` format keep parsing correctly and switch to the
+  new format the next time they're saved.
+
 ### Fixed
+- The service worker no longer registers during local development (`vite dev`), only in the
+  production build. It was registering unconditionally (and in two places at once — `index.html`
+  and `main.tsx`), which meant a browser used for local testing would cache-first every asset
+  indefinitely and keep serving a stale JS bundle after source changes, since the dev server
+  reuses the already-built `docs/sw.js`. The two registration sites are now consolidated into one,
+  guarded by `import.meta.env.PROD`.
 - Mobile header no longer slides up under the notch / Dynamic Island / status bar on iPhone when
   scrolled. `position: sticky` re-anchors to the viewport's top edge on scroll, ignoring the
   `env(safe-area-inset-top)` padding `<body>` already accounted for, so the header (and the

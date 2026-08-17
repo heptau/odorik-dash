@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Contact } from '../api';
+import { parseContactName, buildContactName } from '../api';
 import { useT } from '../i18n';
 
 interface ContactModalProps {
@@ -21,14 +22,11 @@ export default function ContactModal({ isOpen, onClose, onSave, initialData }: C
   useEffect(() => {
     if (isOpen) {
       if (initialData) {
-        // Parse the concatenated name format back into fields
-        const nameMatch = initialData.name.match(/^([^<]*)/);
-        const surnameMatch = initialData.name.match(/<b>(.*?)<\/b>/);
-        const noteMatch = initialData.name.match(/<i>(.*?)<\/i>/);
+        const parsed = parseContactName(initialData.name);
 
-        setName(nameMatch ? nameMatch[1].trim() : '');
-        setSurname(surnameMatch ? surnameMatch[1].trim() : '');
-        setNote(noteMatch ? noteMatch[1].trim() : '');
+        setName(parsed.name);
+        setSurname(parsed.surname);
+        setNote(parsed.note);
         setNumber(initialData.number);
         setShortcut(initialData.shortcut.toString());
       } else {
@@ -47,12 +45,7 @@ export default function ContactModal({ isOpen, onClose, onSave, initialData }: C
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Concat name parts back together following Odorik format
-    const fullname = [
-      name.trim(),
-      surname.trim() ? `<b>${surname.trim()}</b>` : '',
-      note.trim() ? `<i>${note.trim()}</i>` : ''
-    ].filter(Boolean).join(' ').trim();
+    const fullname = buildContactName(name, surname, note);
 
     try {
       await onSave({
