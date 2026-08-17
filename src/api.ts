@@ -192,10 +192,14 @@ export const unifyPhoneNo = (raw: string): string => {
 };
 
 // Parsed representation of an Odorik contact name.
-// Odorik stores names as one plain-text field. Legacy contacts mark surname/note
-// with visible <b>/<i> tags, which show up literally wherever the string isn't
-// rendered as HTML (phones, other apps). New contacts use invisible zero-width
-// markers instead, so the raw string still reads as plain "First Last note".
+// Odorik stores names as one plain-text field, sent verbatim to phones, SIP
+// clients and other apps — it can't carry markup or invisible characters, since
+// some of those get stripped, escaped, or garbled outside this app's own HTML
+// rendering (that's what SURNAME_MARKER/NOTE_MARKER and <b>/<i> below were for).
+// Current contacts delimit surname/note with two consecutive plain spaces
+// instead: apps that know the convention can split on it or collapse it to one
+// space themselves, and apps that don't just see a harmless double space, which
+// HTML rendering collapses to one anyway.
 export interface ParsedContactName {
 	name: string;
 	surname: string;
@@ -204,41 +208,62 @@ export interface ParsedContactName {
 	displayName: string;
 }
 
-// Zero-width marker characters used to delimit surname/note in newly saved names.
-// They contribute no visible glyph or width, so "Jan⁣Novak ⁤note" still
-// displays as the plain "Jan Novak note".
+// Legacy zero-width marker characters, kept only to keep parsing contacts saved
+// while this format was in use. No longer written by buildContactName.
 export const SURNAME_MARKER = '⁣'; // INVISIBLE SEPARATOR
 export const NOTE_MARKER = '⁤'; // INVISIBLE PLUS
 
-// Build the fullname string sent to Odorik from separate fields, using the
-// invisible marker format (see SURNAME_MARKER/NOTE_MARKER above).
+// Stands in for a blank first-name segment when surname/note follow it, so the
+// leading double space can't be swallowed by trimming somewhere along the way
+// (this app, the Odorik API, or another app displaying the name) and throw off
+// the position-based split in parseContactName. A plain "." survives anything
+// that would mangle markup or non-ASCII characters, including SIP.
+export const EMPTY_NAME_PLACEHOLDER = '.';
+
+// Build the fullname string sent to Odorik from separate fields, delimiting
+// surname/note with a double space (see the format note on ParsedContactName).
+// A placeholder empty surname segment is kept when only a note is present, so
+// position (1st/2nd/3rd double-space-separated segment) still tells fields apart.
 export const buildContactName = (name: string, surname: string, note: string): string => {
-	const parts = [name.trim()];
-	if (surname.trim()) parts.push(SURNAME_MARKER + surname.trim());
-	if (note.trim()) parts.push(NOTE_MARKER + note.trim());
-	return parts.join(' ').trim();
+	const trimmedName = name.trim();
+	const hasSurnameOrNote = Boolean(surname.trim() || note.trim());
+	const parts = [trimmedName || (hasSurnameOrNote ? EMPTY_NAME_PLACEHOLDER : '')];
+	if (hasSurnameOrNote) parts.push(surname.trim());
+	if (note.trim()) parts.push(note.trim());
+	return parts.join('  ');
 };
 
-// Parse contact name components, supporting both the current invisible-marker
-// format and the legacy <b>/<i> tag format for contacts saved before this change:
-// "Jan ⁣Novak ⁤poznamka" or "Jan <b>Novak</b> <i>poznamka</i>"
+// Parse contact name components, supporting the current double-space format
+// plus the two legacy formats it replaced (see ParsedContactName):
+// "Jan  Novak  poznamka" or "Jan ⁣Novak ⁤poznamka" or "Jan <b>Novak</b> <i>poznamka</i>"
 // -> { name: "Jan", surname: "Novak", note: "poznamka", displayName: "Jan Novak" }
 export const parseContactName = (fullname: string): ParsedContactName => {
-	const hasMarkers = fullname.includes(SURNAME_MARKER) || fullname.includes(NOTE_MARKER);
+	let name = '';
+	let surname = '';
+	let note = '';
 
-	const nameMatch = hasMarkers
-		? fullname.match(new RegExp(`^([^${SURNAME_MARKER}${NOTE_MARKER}]*)`))
-		: fullname.match(/^([^<]*)/);
-	const surnameMatch = hasMarkers
-		? fullname.match(new RegExp(`${SURNAME_MARKER}([^${NOTE_MARKER}]*)`))
-		: fullname.match(/<b>(.*?)<\/b>/);
-	const noteMatch = hasMarkers
-		? fullname.match(new RegExp(`${NOTE_MARKER}(.*)$`))
-		: fullname.match(/<i>(.*?)<\/i>/);
+	if (fullname.includes(SURNAME_MARKER) || fullname.includes(NOTE_MARKER)) {
+		const nameMatch = fullname.match(new RegExp(`^([^${SURNAME_MARKER}${NOTE_MARKER}]*)`));
+		const surnameMatch = fullname.match(new RegExp(`${SURNAME_MARKER}([^${NOTE_MARKER}]*)`));
+		const noteMatch = fullname.match(new RegExp(`${NOTE_MARKER}(.*)$`));
+		name = nameMatch ? nameMatch[1].trim() : '';
+		surname = surnameMatch ? surnameMatch[1].trim() : '';
+		note = noteMatch ? noteMatch[1].trim() : '';
+	} else if (fullname.includes('<b>') || fullname.includes('<i>')) {
+		const nameMatch = fullname.match(/^([^<]*)/);
+		const surnameMatch = fullname.match(/<b>(.*?)<\/b>/);
+		const noteMatch = fullname.match(/<i>(.*?)<\/i>/);
+		name = nameMatch ? nameMatch[1].trim() : '';
+		surname = surnameMatch ? surnameMatch[1].trim() : '';
+		note = noteMatch ? noteMatch[1].trim() : '';
+	} else {
+		const segments = fullname.split('  ');
+		const rawName = (segments[0] ?? '').trim();
+		name = rawName === EMPTY_NAME_PLACEHOLDER ? '' : rawName;
+		surname = (segments[1] ?? '').trim();
+		note = segments.slice(2).join('  ').trim();
+	}
 
-	const name = nameMatch ? nameMatch[1].trim() : '';
-	const surname = surnameMatch ? surnameMatch[1].trim() : '';
-	const note = noteMatch ? noteMatch[1].trim() : '';
 	const displayName = [name, surname].filter(Boolean).join(' ');
 	return { name, surname, note, displayName };
 };

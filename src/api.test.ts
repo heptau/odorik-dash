@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { splitPhoneNo, unifyPhoneNo, parseContactName, buildContactName, lookupContact, isInternalPhone, lookupLineByNumber, lookupLineById, lookupContactOrLine } from './api';
+import { splitPhoneNo, unifyPhoneNo, parseContactName, buildContactName, lookupContact, isInternalPhone, lookupLineByNumber, lookupLineById, lookupContactOrLine, SURNAME_MARKER, NOTE_MARKER, EMPTY_NAME_PLACEHOLDER } from './api';
 
 describe('splitPhoneNo', () => {
   it('should split Czech phone number with +420 prefix', () => {
@@ -83,7 +83,17 @@ describe('parseContactName', () => {
     });
   });
 
-  it('should parse name built with invisible markers (surname only)', () => {
+  it('should parse name with legacy invisible markers (surname and note)', () => {
+    const result = parseContactName(`Jan ${SURNAME_MARKER}Novak ${NOTE_MARKER}poznamka`);
+    expect(result).toEqual({
+      name: 'Jan',
+      surname: 'Novak',
+      note: 'poznamka',
+      displayName: 'Jan Novak',
+    });
+  });
+
+  it('should parse name built with double spaces (surname only)', () => {
     const result = parseContactName(buildContactName('Jan', 'Novak', ''));
     expect(result).toEqual({
       name: 'Jan',
@@ -93,7 +103,7 @@ describe('parseContactName', () => {
     });
   });
 
-  it('should parse name built with invisible markers (surname and note)', () => {
+  it('should parse name built with double spaces (surname and note)', () => {
     const result = parseContactName(buildContactName('Jan', 'Novak', 'poznamka'));
     expect(result).toEqual({
       name: 'Jan',
@@ -103,7 +113,7 @@ describe('parseContactName', () => {
     });
   });
 
-  it('should parse name built with invisible markers (note only)', () => {
+  it('should parse name built with double spaces (note only)', () => {
     const result = parseContactName(buildContactName('Jan', '', 'poznamka'));
     expect(result).toEqual({
       name: 'Jan',
@@ -112,12 +122,59 @@ describe('parseContactName', () => {
       displayName: 'Jan',
     });
   });
+
+  it('should parse name built with no first name (surname only)', () => {
+    const result = parseContactName(buildContactName('', 'Novak', ''));
+    expect(result).toEqual({
+      name: '',
+      surname: 'Novak',
+      note: '',
+      displayName: 'Novak',
+    });
+  });
+
+  it('should parse name built with no first name (note only)', () => {
+    const result = parseContactName(buildContactName('', '', 'poznamka'));
+    expect(result).toEqual({
+      name: '',
+      surname: '',
+      note: 'poznamka',
+      displayName: '',
+    });
+  });
+
+  it('should still parse the placeholder correctly after external trimming', () => {
+    const fullname = buildContactName('', 'Novak', 'poznamka');
+    const result = parseContactName(fullname.trim());
+    expect(result).toEqual({
+      name: '',
+      surname: 'Novak',
+      note: 'poznamka',
+      displayName: 'Novak',
+    });
+  });
 });
 
 describe('buildContactName', () => {
-  it('should not contain HTML tags', () => {
+  it('should not contain HTML tags or invisible markers', () => {
     const fullname = buildContactName('Jan', 'Novak', 'poznamka');
     expect(fullname).not.toMatch(/[<>]/);
+    expect(fullname).not.toContain(SURNAME_MARKER);
+    expect(fullname).not.toContain(NOTE_MARKER);
+  });
+
+  it('should delimit fields with two spaces', () => {
+    expect(buildContactName('Jan', 'Novak', 'poznamka')).toBe('Jan  Novak  poznamka');
+    expect(buildContactName('Jan', 'Novak', '')).toBe('Jan  Novak');
+    expect(buildContactName('Jan', '', 'poznamka')).toBe('Jan    poznamka');
+    expect(buildContactName('Jan', '', '')).toBe('Jan');
+  });
+
+  it('should use a placeholder for a blank first name so it is not trimmed away', () => {
+    expect(buildContactName('', 'Novak', 'poznamka')).toBe(`${EMPTY_NAME_PLACEHOLDER}  Novak  poznamka`);
+    expect(buildContactName('', 'Novak', '')).toBe(`${EMPTY_NAME_PLACEHOLDER}  Novak`);
+    expect(buildContactName('', '', 'poznamka')).toBe(`${EMPTY_NAME_PLACEHOLDER}    poznamka`);
+    expect(buildContactName('', '', '')).toBe('');
   });
 });
 

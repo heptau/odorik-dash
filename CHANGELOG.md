@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Contact name/surname/note are no longer joined with invisible zero-width marker characters.
+  Those markers get stripped or mangled by some SIP clients and other apps that pass the name
+  through, so contacts are now delimited with two plain spaces instead — a convention apps that
+  know it can split on or collapse to one space, and apps that don't just see a harmless double
+  space (which HTML rendering collapses to one anyway). Existing contacts saved with either the
+  older `<b>`/`<i>` tag format or the invisible-marker format keep parsing correctly and switch
+  to the new double-space format the next time they're saved. When there's a surname or note but
+  no first name, a literal `.` stands in for the blank first name so the leading double space
+  can't be trimmed away by something along the way and throw off the split.
+
 ## [1.1.0] - 2026-08-17
 
 ### Security
