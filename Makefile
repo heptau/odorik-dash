@@ -1,4 +1,4 @@
-.PHONY: help build start stop dev lint test test-watch preview clean install status
+.PHONY: help build start stop dev lint test test-watch preview clean install status release
 
 DEV_PID_FILE := .dev-server.pid
 DEV_PORT := 5180
@@ -11,6 +11,7 @@ help:
 	@echo "  make status       Show if dev server is running"
 	@echo "  make dev          Start dev server (foreground)"
 	@echo "  make build        Build production version"
+	@echo "  make release VERSION=X.Y.Z   Bump VERSION+CHANGELOG, build, commit"
 	@echo "  make preview      Preview production build"
 	@echo "  make lint         Run code linting"
 	@echo "  make test         Run tests"
@@ -84,3 +85,6 @@ clean:
 
 install:
 	npm install
+
+release:
+	@VERSION=$(VERSION) scripts/prepare_release.sh
