@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-17
+
 ### Security
 - Stored login credentials (`localStorage`, AES-GCM) were encrypted with a key derived purely from
   a hardcoded string baked into the public JS bundle, combined with an all-zero IV reused on every
