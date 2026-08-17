@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- Stored login credentials (`localStorage`, AES-GCM) were encrypted with a key derived purely from
+  a hardcoded string baked into the public JS bundle, combined with an all-zero IV reused on every
+  encryption — so the "encryption" gave no real confidentiality (the key was derivable from the
+  published source) and reusing a nonce under a fixed key is a critical AES-GCM misuse. Credentials
+  are now encrypted with a random per-device key (generated once via `crypto.getRandomValues` and
+  stored separately from the ciphertext) and a fresh random IV on every save. Credentials saved
+  under the old scheme are transparently decrypted once and migrated to the new format.
+
 ### Changed
 - Contact name/surname/note (company) are no longer joined with visible `<b>`/`<i>` HTML tags in
   the string stored via the Odorik API. They're now delimited with invisible zero-width marker

@@ -28,6 +28,7 @@ export interface OdorikCredentials {
 }
 
 const CREDENTIALS_KEY = 'odorik_credentials';
+const DEVICE_KEY_STORAGE_KEY = 'odorik_device_key';
 
 interface RetryOptions {
   retries?: number;
@@ -49,9 +50,31 @@ async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions = {}): P
   throw new Error('Retry exhausted');
 }
 
-async function getEncryptionKey(): Promise<CryptoKey> {
+// Legacy (pre device-key) derivation: a fixed key derived from a hardcoded
+// string baked into the public JS bundle, combined with an all-zero IV reused
+// on every encryption. Both are cryptographic mistakes (the "key" is
+// recoverable by anyone who reads the source, and AES-GCM nonce reuse under a
+// fixed key breaks confidentiality/integrity guarantees). Kept only to decrypt
+// credentials saved before this fix, then migrated to the new format below.
+async function getLegacyEncryptionKey(): Promise<CryptoKey> {
   const rawKey = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('odorik-dash-v1-salt'));
   return crypto.subtle.importKey('raw', rawKey, 'AES-GCM', false, ['encrypt', 'decrypt']);
+}
+
+// Per-device random key, generated once with a CSPRNG and kept in localStorage
+// separately from the ciphertext, so the key is not derivable from the public
+// source code. Combined with a fresh random IV per encryption (see
+// saveCredentials) to avoid AES-GCM nonce reuse.
+async function getDeviceEncryptionKey(): Promise<CryptoKey> {
+  let rawKey: Uint8Array;
+  const stored = localStorage.getItem(DEVICE_KEY_STORAGE_KEY);
+  if (stored) {
+    rawKey = Uint8Array.from(atob(stored), c => c.charCodeAt(0));
+  } else {
+    rawKey = crypto.getRandomValues(new Uint8Array(32));
+    localStorage.setItem(DEVICE_KEY_STORAGE_KEY, btoa(String.fromCharCode(...rawKey)));
+  }
+  return crypto.subtle.importKey('raw', rawKey as BufferSource, 'AES-GCM', false, ['encrypt', 'decrypt']);
 }
 
 export const loadCredentials = async (): Promise<OdorikCredentials | null> => {
@@ -59,14 +82,35 @@ export const loadCredentials = async (): Promise<OdorikCredentials | null> => {
   if (!encrypted) return null;
 
   try {
-    const key = await getEncryptionKey();
-    const decrypted = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: new Uint8Array(12) },
-      key,
-      JSON.parse(atob(encrypted))
-    );
+    const parsed = JSON.parse(atob(encrypted));
+
+    let decrypted: ArrayBuffer;
+    if (Array.isArray(parsed)) {
+      // Legacy format: plain ciphertext byte array, fixed key, zero IV.
+      const key = await getLegacyEncryptionKey();
+      decrypted = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: new Uint8Array(12) },
+        key,
+        Uint8Array.from(parsed)
+      );
+    } else {
+      const key = await getDeviceEncryptionKey();
+      decrypted = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: Uint8Array.from(parsed.iv) },
+        key,
+        Uint8Array.from(parsed.data)
+      );
+    }
+
     const { user, pass } = JSON.parse(new TextDecoder().decode(decrypted));
-    return user && pass ? { user, pass } : null;
+    if (!user || !pass) return null;
+
+    if (Array.isArray(parsed)) {
+      // Migrate legacy-format credentials to the new per-device key + random IV.
+      await saveCredentials({ user, pass });
+    }
+
+    return { user, pass };
   } catch {
     localStorage.removeItem(CREDENTIALS_KEY);
     return null;
@@ -74,13 +118,17 @@ export const loadCredentials = async (): Promise<OdorikCredentials | null> => {
 };
 
 export const saveCredentials = async (creds: OdorikCredentials): Promise<void> => {
-  const key = await getEncryptionKey();
+  const key = await getDeviceEncryptionKey();
+  const iv = crypto.getRandomValues(new Uint8Array(12));
   const encrypted = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv: new Uint8Array(12) },
+    { name: 'AES-GCM', iv },
     key,
     new TextEncoder().encode(JSON.stringify(creds))
   );
-  localStorage.setItem(CREDENTIALS_KEY, btoa(JSON.stringify(Array.from(new Uint8Array(encrypted)))));
+  localStorage.setItem(CREDENTIALS_KEY, btoa(JSON.stringify({
+    iv: Array.from(iv),
+    data: Array.from(new Uint8Array(encrypted)),
+  })));
 };
 
 export const clearCredentials = (): void => {

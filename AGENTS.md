@@ -51,7 +51,7 @@ docs/                  # Build output for GitHub Pages
 - Uses `navigator.languages` to detect system preferences
 
 ## Key Features (Status)
-- ✅ Authentication (SIP/API credentials, encrypted with AES-GCM)
+- ✅ Authentication (SIP/API credentials, encrypted with AES-GCM using a random per-device key + random IV per save, both generated with `crypto.getRandomValues`)
 - ✅ Unified Activity feed (calls + SMS history, with filters)
 - ✅ SMS history (received/sent, sending)
 - ✅ Speed dials (CRUD contacts)
