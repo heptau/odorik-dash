@@ -210,8 +210,11 @@ function App() {
 			</nav>
 			</aside>
 
+			{/* MOBILE STATUS BAR BACKGROUND (notch / dynamic island / camera area) */}
+			<div className="md:hidden fixed top-0 left-0 right-0 blur-bg z-40" style={{ height: 'env(safe-area-inset-top)' }} />
+
 			{/* MOBILE HEADER */}
-			<header className="md:hidden sticky top-0 blur-bg border-b flex items-center justify-between px-6 py-4 z-40 shadow-sm" style={{ borderBottomColor: 'var(--separator)' }}>
+			<header className="md:hidden sticky blur-bg border-b flex items-center justify-between px-6 py-4 z-40 shadow-sm" style={{ top: 'env(safe-area-inset-top)', borderBottomColor: 'var(--separator)' }}>
 				<div className="flex items-center gap-2">
 					<div className="w-8 h-8 rounded-xl flex items-center justify-center shadow-lg" style={{ backgroundColor: 'var(--accent)', boxShadow: '0 4px 12px var(--shadow)' }}>
 						<svg className="w-5 h-5" style={{ color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>

@@ -22,7 +22,7 @@ export default function OfflineIndicator() {
 
   if (isOffline) {
     return (
-      <div className="fixed top-0 left-0 right-0 z-50 px-4 py-2 text-center text-sm font-medium text-white bg-amber-600">
+      <div className="fixed top-0 left-0 right-0 z-50 px-4 py-2 text-center text-sm font-medium text-white bg-amber-600" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.5rem)' }}>
         {t('common.offline')}
       </div>
     );
