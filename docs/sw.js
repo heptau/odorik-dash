@@ -1,4 +1,4 @@
-const CACHE_VERSION = '1.1.0';
+const CACHE_VERSION = '1.1.1';
 const CACHE_NAME = `odorik-dash-v${CACHE_VERSION}`;
 const STATIC_ASSETS = [
   '/',

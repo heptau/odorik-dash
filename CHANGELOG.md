@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-08-17
+
 ### Changed
 - Contact name/surname/note are no longer joined with invisible zero-width marker characters.
   Those markers get stripped or mangled by some SIP clients and other apps that pass the name
