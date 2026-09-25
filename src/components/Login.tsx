@@ -30,13 +30,12 @@ export default function Login({ onLogin }: { onLogin: (creds: OdorikCredentials)
   };
 
   const containerStyle = {
-    backgroundColor: 'var(--bg-secondary)',
+    backgroundColor: 'var(--bg-grouped)',
   };
   
   const formStyle = {
     backgroundColor: 'var(--surface)',
-    borderColor: 'var(--separator)',
-    boxShadow: '0 20px 40px var(--shadow-strong)',
+    boxShadow: '0 10px 30px var(--shadow)',
   };
   
   const titleStyle = {
@@ -52,16 +51,15 @@ export default function Login({ onLogin }: { onLogin: (creds: OdorikCredentials)
   };
   
   const inputStyle = {
-    backgroundColor: 'var(--bg-tertiary)',
-    borderColor: 'var(--separator)',
+    backgroundColor: 'var(--fill)',
     color: 'var(--text-primary)',
   };
 
   return (
     <div className="flex items-center justify-center h-full p-4" style={containerStyle}>
-      <form onSubmit={submit} className="p-6 md:p-8 rounded-2xl border w-full max-w-sm" style={formStyle}>
+      <form onSubmit={submit} className="p-6 md:p-8 rounded-[32px] w-full max-w-sm" style={formStyle}>
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold tracking-tight" style={titleStyle}>{t('login.title')}</h1>
+          <h1 className="text-[28px] font-bold tracking-tight" style={titleStyle}>{t('login.title')}</h1>
           <p className="text-sm mt-2" style={subtitleStyle}>{t('login.subtitle')}</p>
           {error && (
             <p className="text-sm mt-2 text-red-600 font-medium" style={{ color: 'var(--destructive)' }}>{error}</p>
@@ -75,7 +73,7 @@ export default function Login({ onLogin }: { onLogin: (creds: OdorikCredentials)
               type="text" 
               value={user} 
               onChange={e => setUser(e.target.value)} 
-              className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 transition-all outline-none" 
+              className="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 transition-all outline-none" 
               style={inputStyle}
               placeholder="123456" 
               required
@@ -87,7 +85,7 @@ export default function Login({ onLogin }: { onLogin: (creds: OdorikCredentials)
               type="password" 
               value={pass} 
               onChange={e => setPass(e.target.value)} 
-              className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 transition-all outline-none" 
+              className="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 transition-all outline-none" 
               style={inputStyle}
               placeholder="••••••••" 
               required
@@ -95,7 +93,7 @@ export default function Login({ onLogin }: { onLogin: (creds: OdorikCredentials)
           </div>
         </div>
 
-        <button type="submit" disabled={loading} className="w-full mt-6 py-3 rounded-xl transition-all font-medium disabled:opacity-50" style={{ backgroundColor: 'var(--accent)', color: 'white' }}>
+        <button type="submit" disabled={loading} className="w-full mt-6 py-3.5 rounded-full transition-all text-[17px] font-semibold active:scale-[0.98] disabled:opacity-50" style={{ backgroundColor: 'var(--accent)', color: 'white' }}>
           {loading ? t('common.loading') : t('login.submit')}
         </button>
       </form>

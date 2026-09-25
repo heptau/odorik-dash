@@ -29,6 +29,8 @@ build:
 	mkdir -p docs/locales && cp src/i18n/locales/*.json docs/locales/
 	mkdir -p docs/.well-known && cp src/.well-known/security.txt docs/.well-known/
 	cp src/CNAME docs/CNAME
+	# GitHub Pages runs Jekyll by default, which skips dot-directories like .well-known
+	touch docs/.nojekyll
 
 start:
 	@if [ -f $(DEV_PID_FILE) ] && kill -0 $$(cat $(DEV_PID_FILE)) 2>/dev/null; then \

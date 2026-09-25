@@ -67,7 +67,7 @@ export default function SendSms({ creds }: { creds: OdorikCredentials }) {
 
   return (
     <div className="max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-6 font-display" style={{ color: 'var(--text-primary)' }}>{t('send_sms.title')}</h2>
+      <h2 className="text-[34px] leading-tight font-bold tracking-tight mb-6" style={{ color: 'var(--text-primary)' }}>{t('send_sms.title')}</h2>
 
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-2xl border border-red-100 mb-6 flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
@@ -84,7 +84,7 @@ export default function SendSms({ creds }: { creds: OdorikCredentials }) {
       )}
 
       <form onSubmit={handleSend} className="space-y-6">
-        <div className="p-6 rounded-3xl shadow-sm space-y-5" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px', borderStyle: 'solid' }}>
+        <div className="p-5 rounded-[26px] space-y-5" style={{ backgroundColor: 'var(--surface)' }}>
           <div>
             <label className="block text-sm font-semibold mb-1.5 ml-1" style={{ color: 'var(--text-primary)' }}>{t('send_sms.recipient')}</label>
             <input
@@ -92,7 +92,7 @@ export default function SendSms({ creds }: { creds: OdorikCredentials }) {
               value={recipient}
               onChange={(e) => setRecipient(e.target.value)}
               placeholder="+420..."
-              className="w-full px-4 py-3.5 border rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+              className="w-full px-4 py-3.5 rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all outline-none"
               style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--separator)', color: 'var(--text-primary)' }}
               required
             />
@@ -105,8 +105,8 @@ export default function SendSms({ creds }: { creds: OdorikCredentials }) {
                 <button 
                   type="button"
                   onClick={optimize}
-                  className="text-xs font-bold flex items-center gap-1 px-2 py-1 rounded-lg"
-                  style={{ backgroundColor: 'var(--accent-light)', color: 'var(--accent)' }}
+                  className="text-xs font-semibold flex items-center gap-1 px-2.5 py-1 rounded-full"
+                  style={{ backgroundColor: 'var(--accent-tint)', color: 'var(--accent)' }}
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                   {t('send_sms.optimize')}
@@ -118,7 +118,7 @@ export default function SendSms({ creds }: { creds: OdorikCredentials }) {
               onChange={(e) => setMessage(e.target.value)}
               placeholder={t('send_sms.placeholder')}
               rows={5}
-              className="w-full px-4 py-3.5 border rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all outline-none resize-none"
+              className="w-full px-4 py-3.5 rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all outline-none resize-none"
               style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--separator)', color: 'var(--text-primary)' }}
               required
             />
@@ -126,22 +126,22 @@ export default function SendSms({ creds }: { creds: OdorikCredentials }) {
             <div className="mt-3 flex justify-between items-center px-1">
               <div className="flex gap-4">
                 <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-black tracking-widest" style={{ color: 'var(--text-tertiary)' }}>{t('send_sms.length')}</span>
+                  <span className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{t('send_sms.length')}</span>
                   <span className={`text-sm font-bold ${stats.len > (stats.isGsm ? 160 : 70) ? 'text-orange-600' : ''}`} style={{ color: stats.len > (stats.isGsm ? 160 : 70) ? 'var(--warning)' : 'var(--text-primary)' }}>{stats.len}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-black tracking-widest" style={{ color: 'var(--text-tertiary)' }}>{t('send_sms.parts')}</span>
+                  <span className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>{t('send_sms.parts')}</span>
                   <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{stats.parts}</span>
                 </div>
                 {!stats.isGsm && (
                   <div className="flex flex-col">
-                    <span className="text-[10px] uppercase font-black tracking-widest" style={{ color: 'var(--destructive)' }}>{t('send_sms.mode')}</span>
+                    <span className="text-xs font-medium" style={{ color: 'var(--destructive)' }}>{t('send_sms.mode')}</span>
                     <span className="text-sm font-bold" style={{ color: 'var(--destructive)' }}>UCS-2</span>
                   </div>
                 )}
               </div>
               <div className="text-right">
-                <span className="text-[10px] uppercase font-black tracking-widest block" style={{ color: 'var(--text-tertiary)' }}>{t('send_sms.remaining')}</span>
+                <span className="text-xs font-medium block" style={{ color: 'var(--text-tertiary)' }}>{t('send_sms.remaining')}</span>
                 <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{stats.remaining}</span>
               </div>
             </div>
@@ -151,8 +151,8 @@ export default function SendSms({ creds }: { creds: OdorikCredentials }) {
         <button
           type="submit"
           disabled={loading || !message || !recipient}
-          className="w-full py-4 px-6 text-white font-bold rounded-2xl active:scale-[0.98] transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2"
-          style={{ backgroundColor: 'var(--accent)', boxShadow: '0 4px 12px var(--shadow)' }}
+          className="w-full py-4 px-6 text-white text-[17px] font-semibold rounded-full active:scale-[0.98] transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2"
+          style={{ backgroundColor: 'var(--accent)' }}
         >
           {loading ? (
             <>
@@ -168,8 +168,8 @@ export default function SendSms({ creds }: { creds: OdorikCredentials }) {
         </button>
       </form>
 
-      <div className="mt-8 p-6 rounded-3xl" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--separator)', borderWidth: '1px', borderStyle: 'solid' }}>
-        <h3 className="text-sm font-bold mb-2 uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>{t('send_sms.tip_title')}</h3>
+      <div className="mt-8 p-5 rounded-[26px]" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+        <h3 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{t('send_sms.tip_title')}</h3>
         <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
           {t('send_sms.tip_text')}
         </p>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchBalance, readCache, writeCache, isCacheStale, isOffline, getBalanceCacheKey, CACHE_TTL_10_MIN } from '../api';
+import { fetchBalance, isValidBalance, readCache, writeCache, isCacheStale, isOffline, getBalanceCacheKey, CACHE_TTL_10_MIN } from '../api';
 import type { OdorikCredentials } from '../api';
 
 interface UseBalanceOptions {
@@ -15,6 +15,12 @@ function isAuthError(message: string): boolean {
 	return AUTH_ERROR_PATTERNS.some(p => lower.includes(p));
 }
 
+// Older versions could cache an API error string as the balance; treat such entries as missing.
+async function readValidCachedBalance(cacheKey: string) {
+	const cached = await readCache<string>(cacheKey);
+	return cached && isValidBalance(cached.data) ? cached : null;
+}
+
 export function useBalance(creds: OdorikCredentials | null, options: UseBalanceOptions = {}) {
 	const { autoRefresh = true, refreshInterval = CACHE_TTL_10_MIN, onAuthError } = options;
 
@@ -26,7 +32,7 @@ export function useBalance(creds: OdorikCredentials | null, options: UseBalanceO
 		if (!creds) return;
 
 		const cacheKey = getBalanceCacheKey(creds);
-		const cached = await readCache<string>(cacheKey);
+		const cached = await readValidCachedBalance(cacheKey);
 
 		if (isOffline()) {
 			if (cached) setBalance(cached.data);
@@ -58,7 +64,7 @@ export function useBalance(creds: OdorikCredentials | null, options: UseBalanceO
 		if (!creds) return;
 
 		const loadCache = async () => {
-			const cachedBalance = await readCache<string>(getBalanceCacheKey(creds));
+			const cachedBalance = await readValidCachedBalance(getBalanceCacheKey(creds));
 			if (cachedBalance) setBalance(cachedBalance.data);
 		};
 		loadCache();

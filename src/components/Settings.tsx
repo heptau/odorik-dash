@@ -64,15 +64,11 @@ export default function Settings({ onClearCache }: SettingsProps) {
 		window.location.reload();
 	};
 
-	const renderLocaleButtons = (locales: typeof suggested, isLast: boolean) => locales.map((l, i) => (
+	const renderLocaleButtons = (locales: typeof suggested) => locales.map(l => (
 		<button
 			key={l.code}
 			onClick={() => handleChange(l.code)}
-			className={`w-full px-4 py-3 flex justify-between items-center transition-colors ${i === 0 ? 'rounded-t-2xl' : ''} ${isLast && i === locales.length - 1 ? 'rounded-b-2xl' : ''}`}
-			style={{
-				backgroundColor: 'transparent',
-				borderBottom: i < locales.length - 1 ? '0.5px solid var(--separator)' : 'none'
-			}}
+			className="w-full px-4 py-3 flex justify-between items-center transition-colors ios-pressable"
 		>
 			<span style={{ color: 'var(--text-primary)' }}>{l.name}</span>
 			{locale === l.code && (
@@ -96,27 +92,27 @@ export default function Settings({ onClearCache }: SettingsProps) {
 	return (
 		<div className="space-y-6 animate-in fade-in duration-300">
 			<div>
-				<h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{t('settings.title')}</h2>
+				<h2 className="text-[34px] leading-tight font-bold tracking-tight mb-4" style={{ color: 'var(--text-primary)' }}>{t('settings.title')}</h2>
 			</div>
 
 			<section>
-				<h3 className="text-xs font-medium ml-4 mb-2" style={{ color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+				<h3 className="text-[13px] font-medium ml-4 mb-2" style={{ color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
 					{t('settings.language')}
 				</h3>
 				<div className="space-y-4">
 					<h4 className="text-xs font-medium ml-4 mb-1" style={{ color: 'var(--text-secondary)' }}>
 						{t('settings.language_suggested')}
 					</h4>
-					<div className="overflow-hidden rounded-2xl" style={{ backgroundColor: 'var(--surface)', border: '0.5px solid var(--separator)' }}>
-						{renderLocaleButtons(suggested, other.length === 0)}
+					<div className="ios-group ios-rows">
+						{renderLocaleButtons(suggested)}
 					</div>
 					{other.length > 0 && (
 						<>
 							<h4 className="text-xs font-medium ml-4 mb-1" style={{ color: 'var(--text-secondary)' }}>
 								{t('settings.language_other')}
 							</h4>
-							<div className="overflow-hidden rounded-2xl" style={{ backgroundColor: 'var(--surface)', border: '0.5px solid var(--separator)' }}>
-								{renderLocaleButtons(other, true)}
+							<div className="ios-group ios-rows">
+								{renderLocaleButtons(other)}
 							</div>
 						</>
 					)}
@@ -124,30 +120,28 @@ export default function Settings({ onClearCache }: SettingsProps) {
 			</section>
 
 			<section>
-				<h3 className="text-xs font-medium ml-4 mb-2" style={{ color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+				<h3 className="text-[13px] font-medium ml-4 mb-2" style={{ color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
 					{t('settings.cache')}
 				</h3>
 				<div className="space-y-3">
 					{/* Cache TTL Settings */}
-					<div className="rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)' }}>
-						<div className="px-4 py-3 flex justify-between items-center" style={{ borderBottom: '0.5px solid var(--separator)' }}>
+					<div className="ios-group ios-rows">
+						<div className="px-4 py-3 flex justify-between items-center">
 							<span style={{ color: 'var(--text-primary)' }}>{t('settings.cache_contacts')}</span>
 							<select
 								value={cacheTTL.contacts}
 								onChange={(e) => saveCacheTTL('contacts', Number(e.target.value))}
-								className="text-sm px-2 py-1 rounded-lg border outline-none"
-								style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--separator)', color: 'var(--text-secondary)' }}
+								className="ios-picker text-[17px]"
 							>
 								{cacheOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
 							</select>
 						</div>
-						<div className="px-4 py-3 flex justify-between items-center" style={{ borderBottom: '0.5px solid var(--separator)' }}>
+						<div className="px-4 py-3 flex justify-between items-center">
 							<span style={{ color: 'var(--text-primary)' }}>{t('settings.cache_activity')}</span>
 							<select
 								value={cacheTTL.activity}
 								onChange={(e) => saveCacheTTL('activity', Number(e.target.value))}
-								className="text-sm px-2 py-1 rounded-lg border outline-none"
-								style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--separator)', color: 'var(--text-secondary)' }}
+								className="ios-picker text-[17px]"
 							>
 								{cacheOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
 							</select>
@@ -157,15 +151,14 @@ export default function Settings({ onClearCache }: SettingsProps) {
 							<select
 								value={cacheTTL.lines}
 								onChange={(e) => saveCacheTTL('lines', Number(e.target.value))}
-								className="text-sm px-2 py-1 rounded-lg border outline-none"
-								style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--separator)', color: 'var(--text-secondary)' }}
+								className="ios-picker text-[17px]"
 							>
 								{cacheOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
 							</select>
 						</div>
 					</div>
 					{/* Clear Cache Button */}
-					<div className="rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)' }}>
+					<div className="ios-group">
 						<button
 							onClick={handleClearCache}
 							className="w-full px-4 py-3 flex justify-between items-center transition-colors"
@@ -181,19 +174,19 @@ export default function Settings({ onClearCache }: SettingsProps) {
 			</section>
 
 			<section>
-				<h3 className="text-xs font-medium ml-4 mb-2" style={{ color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+				<h3 className="text-[13px] font-medium ml-4 mb-2" style={{ color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
 					{t('settings.about')}
 				</h3>
-				<div className="rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)' }}>
+				<div className="ios-group">
 					<button onClick={() => setShowAboutDetails(!showAboutDetails)} className="w-full">
-						<div className="p-4 flex justify-between items-center" style={{ borderBottom: showAboutDetails ? 'none' : '0.5px solid var(--separator)' }}>
+						<div className="p-4 flex justify-between items-center">
 							<div className="flex flex-col items-start">
 								<span className="text-base" style={{ color: 'var(--text-primary)' }}>{t('settings.version')}: {version}</span>
 								<span className="text-sm" style={{ color: 'var(--text-secondary)' }}>MIT License</span>
 							</div>
 							<div className="flex items-center gap-2">
 								{!showAboutDetails && (
-									<a href="https://github.com/heptau/odorik-dash" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-sm px-2 py-1 rounded-lg" style={{ backgroundColor: 'var(--accent-tint)', color: 'var(--accent)' }}>
+									<a href="https://github.com/heptau/odorik-dash" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-sm px-3 py-1 rounded-full" style={{ backgroundColor: 'var(--accent-tint)', color: 'var(--accent)' }}>
 										GitHub
 									</a>
 								)}
@@ -228,7 +221,7 @@ export default function Settings({ onClearCache }: SettingsProps) {
 										{updateStatus === 'no-sw' && 'PWA not available'}
 									</span>
 									{updateStatus === 'idle' && (
-										<button onClick={checkForUpdates} className="text-sm px-3 py-1.5 rounded-lg btn-press" style={{ backgroundColor: 'var(--accent-tint)', color: 'var(--accent)' }}>
+										<button onClick={checkForUpdates} className="text-sm px-3.5 py-1.5 rounded-full btn-press" style={{ backgroundColor: 'var(--accent-tint)', color: 'var(--accent)' }}>
 											{t('settings.check_update')}
 										</button>
 									)}
@@ -236,7 +229,7 @@ export default function Settings({ onClearCache }: SettingsProps) {
 										<div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--accent)', borderTopColor: 'transparent' }} />
 									)}
 									{updateStatus === 'available' && (
-										<button onClick={handleUpdate} className="text-sm px-3 py-1.5 rounded-lg font-medium btn-press" style={{ backgroundColor: 'var(--accent)', color: 'white' }}>
+										<button onClick={handleUpdate} className="text-sm px-3.5 py-1.5 rounded-full font-medium btn-press" style={{ backgroundColor: 'var(--accent)', color: 'white' }}>
 											{t('settings.update_now')}
 										</button>
 									)}

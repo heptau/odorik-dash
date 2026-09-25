@@ -57,24 +57,24 @@ export default function Callback({ creds }: { creds: OdorikCredentials }) {
 
   return (
     <div className="max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>{t('callback.title')}</h2>
+      <h2 className="text-[34px] leading-tight font-bold tracking-tight mb-6" style={{ color: 'var(--text-primary)' }}>{t('callback.title')}</h2>
 
       {error && (
-        <div className="text-red-600 p-4 rounded-2xl mb-6 flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-300" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'var(--separator)', borderWidth: '1px' }}>
+        <div className="text-red-600 p-4 rounded-2xl mb-6 flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-300" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)' }}>
           <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           <span className="text-sm font-medium">{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="text-green-700 p-4 rounded-2xl mb-6 flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-300" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', borderColor: 'var(--separator)', borderWidth: '1px' }}>
+        <div className="text-green-700 p-4 rounded-2xl mb-6 flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-300" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)' }}>
           <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           <span className="text-sm font-medium">{success}</span>
         </div>
       )}
 
       <form onSubmit={handleOrder} className="space-y-6">
-        <div className="p-6 rounded-3xl shadow-sm space-y-5" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px' }}>
+        <div className="p-5 rounded-[26px] space-y-5" style={{ backgroundColor: 'var(--surface)' }}>
           <div>
             <label className="block text-sm font-semibold mb-1.5 ml-1" style={{ color: 'var(--text-primary)' }}>{t('callback.your_number')}</label>
             <input
@@ -86,7 +86,7 @@ export default function Callback({ creds }: { creds: OdorikCredentials }) {
               style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--separator)', color: 'var(--text-primary)' }}
               required
             />
-            <p className="mt-1.5 text-xs ml-1 italic" style={{ color: 'var(--text-tertiary)' }}>{t('callback.your_number_hint')}</p>
+            <p className="mt-1.5 text-xs ml-1" style={{ color: 'var(--text-tertiary)' }}>{t('callback.your_number_hint')}</p>
           </div>
 
           <div>
@@ -123,8 +123,8 @@ export default function Callback({ creds }: { creds: OdorikCredentials }) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-4 px-6 font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2"
-          style={{ backgroundColor: 'var(--accent)', color: 'white', boxShadow: '0 4px 12px var(--shadow)' }}
+          className="w-full py-4 px-6 text-[17px] font-semibold rounded-full active:scale-[0.98] transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2"
+          style={{ backgroundColor: 'var(--accent)', color: 'white' }}
         >
           {loading ? (
             <>
@@ -140,8 +140,8 @@ export default function Callback({ creds }: { creds: OdorikCredentials }) {
         </button>
       </form>
 
-      <div className="mt-8 p-6 rounded-3xl" style={{ backgroundColor: 'rgba(59, 130, 246, 0.05)', borderColor: 'var(--separator)', borderWidth: '1px' }}>
-        <h3 className="text-sm font-bold mb-2 uppercase tracking-wider" style={{ color: 'var(--accent)' }}>{t('callback.how_it_works')}</h3>
+      <div className="mt-8 p-5 rounded-[26px]" style={{ backgroundColor: 'rgba(59, 130, 246, 0.05)' }}>
+        <h3 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--accent)' }}>{t('callback.how_it_works')}</h3>
         <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
           {t('callback.how_it_works_text')}
         </p>

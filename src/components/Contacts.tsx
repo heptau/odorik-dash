@@ -307,8 +307,8 @@ export default function Contacts({ creds, setTab }: { creds: OdorikCredentials; 
   if (loading) {
     return (
       <div className="mb-4">
-        <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{t('contacts.title')}</h2>
-        <div className="rounded-2xl shadow-sm border overflow-hidden p-4" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)' }}>
+        <h2 className="text-[34px] leading-tight font-bold tracking-tight mb-4" style={{ color: 'var(--text-primary)' }}>{t('contacts.title')}</h2>
+        <div className="ios-group p-4">
           <SkeletonList count={5} />
         </div>
       </div>
@@ -317,10 +317,10 @@ export default function Contacts({ creds, setTab }: { creds: OdorikCredentials; 
 
   if (error) {
     return (
-      <div className="bg-red-50 text-red-600 p-5 rounded-2xl border border-red-100 shadow-sm mt-4">
+      <div className="bg-red-50 text-red-600 p-5 rounded-[26px] mt-4">
         <h3 className="font-bold mb-2 text-lg">{t('contacts.errorTitle')}</h3>
         <p className="text-sm opacity-90">{error}</p>
-        <button onClick={load} className="mt-4 px-5 py-2.5 bg-white text-gray-800 rounded-xl shadow-sm text-sm font-semibold border border-gray-200 hover:bg-gray-50 active:scale-95 transition-transform">{t('common.retry')}</button>
+        <button onClick={load} className="mt-4 px-5 py-2.5 ios-capsule text-sm font-semibold active:scale-95 transition-transform">{t('common.retry')}</button>
       </div>
     );
   }
@@ -328,10 +328,10 @@ export default function Contacts({ creds, setTab }: { creds: OdorikCredentials; 
   return (
     <>
       <div className="mb-4 flex justify-between items-center">
-        <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{t('contacts.title')}</h2>
+        <h2 className="text-[34px] leading-tight font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>{t('contacts.title')}</h2>
         <button 
           onClick={() => { setEditingContact(null); setIsModalOpen(true); }}
-          className="p-2.5 rounded-full shadow-md hover:opacity-90 active:scale-95 transition-all"
+          className="w-11 h-11 flex items-center justify-center rounded-full hover:opacity-90 active:scale-95 transition-all"
           style={{ backgroundColor: 'var(--accent)', color: 'white' }}
           aria-label={t('contacts.add')}
         >
@@ -346,13 +346,12 @@ export default function Contacts({ creds, setTab }: { creds: OdorikCredentials; 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('contacts.search')}
-            className="w-full px-4 py-2.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', color: 'var(--text-primary)' }}
+            className="ios-search"
           />
         </div>
       )}
 
-      <div className="rounded-2xl shadow-sm overflow-hidden" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)' }}>
+      <div className="ios-group ios-rows" style={{ '--row-inset': '80px' } as React.CSSProperties}>
         {filteredContacts.length === 0 ? (
           <div className="p-8 text-center" style={{ color: 'var(--text-secondary)' }}>
             {search ? t('contacts.no_results') : t('contacts.empty')}
@@ -363,8 +362,7 @@ export default function Contacts({ creds, setTab }: { creds: OdorikCredentials; 
             <div 
               key={c.shortcut} 
               onClick={() => setActiveActionSheet(c)}
-              className="p-4 flex items-center justify-between transition-colors cursor-pointer group"
-              style={{ borderBottom: '0.5px solid var(--separator)' }}
+              className="p-4 flex items-center justify-between transition-colors cursor-pointer group ios-pressable"
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--accent)' }}>
@@ -379,7 +377,7 @@ export default function Contacts({ creds, setTab }: { creds: OdorikCredentials; 
                 </div>
               </div>
               
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-mono font-bold" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}>
+              <div className="min-w-9 h-7 px-2.5 rounded-full flex items-center justify-center text-sm font-semibold tabular-nums" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}>
                 {c.shortcut}
               </div>
             </div>
@@ -391,13 +389,12 @@ export default function Contacts({ creds, setTab }: { creds: OdorikCredentials; 
       {activeActionSheet && createPortal(
         <div className="fixed inset-0 z-[9999]" style={{ height: '100vh', width: '100vw' }}>
           <div className="absolute inset-0 bg-black/50" onClick={() => setActiveActionSheet(null)} />
-          <div className="absolute bottom-0 left-0 right-0 rounded-t-3xl shadow-2xl p-4 pb-[calc(env(safe-area-inset-bottom)+16px)] max-h-[85vh] overflow-y-auto" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-            <div className="w-1.5 rounded-full mx-auto mb-4" style={{ backgroundColor: 'var(--separator)' }} />
+          <div className="absolute left-2 right-2 bottom-[max(env(safe-area-inset-bottom),8px)] md:left-1/2 md:right-auto md:w-[420px] md:-translate-x-1/2 liquid-glass rounded-[34px] p-3 pt-5 max-h-[85vh] overflow-y-auto">
             <div className="text-center mb-4 px-4">
               <h3 className="font-bold text-xl truncate" style={{ color: 'var(--text-primary)' }}>{parseContactName(activeActionSheet.name).name}</h3>
               <p className="font-medium" style={{ color: 'var(--text-secondary)' }}>{unifyPhoneNo(activeActionSheet.number)}</p>
             </div>
-            <div className="rounded-2xl overflow-hidden mb-4 shadow-sm" style={{ backgroundColor: 'var(--surface)' }}>
+            <div className="ios-group mb-3">
               <button onClick={() => { localStorage.setItem('callback_recipient', activeActionSheet.number); if (setTab) setTab('callback'); setActiveActionSheet(null); }} className="w-full flex items-center gap-4 px-4 py-4 text-left" style={{ backgroundColor: 'var(--surface)' }}>
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(249, 115, 22, 0.1)', color: 'rgba(249, 115, 22, 1)' }}>
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
@@ -405,7 +402,7 @@ export default function Contacts({ creds, setTab }: { creds: OdorikCredentials; 
                 <div className="flex-1 text-center"><div className="font-bold" style={{ color: 'var(--text-primary)' }}>{t('contacts.callback')}</div><div className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('contacts.callbackDesc')}</div></div>
                 <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-tertiary)' }}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
               </button>
-              <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
+              <div className="h-[0.5px] ml-4" style={{ backgroundColor: 'var(--separator)' }} />
               <button onClick={() => { localStorage.setItem('sms_recipient', activeActionSheet.number); if (setTab) setTab('send_sms'); setActiveActionSheet(null); }} className="w-full flex items-center gap-4 px-4 py-4 text-left" style={{ backgroundColor: 'var(--surface)' }}>
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', color: 'var(--accent)' }}>
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
@@ -413,16 +410,16 @@ export default function Contacts({ creds, setTab }: { creds: OdorikCredentials; 
                 <div className="flex-1 text-center"><div className="font-bold" style={{ color: 'var(--text-primary)' }}>{t('contacts.sendSms')}</div><div className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('contacts.sendSmsDesc')}</div></div>
                 <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-tertiary)' }}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
               </button>
-              <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
-              <a href={`tel:${unifyPhoneNo(activeActionSheet.number)}`} className="block w-full text-center py-4 font-semibold text-lg" style={{ color: 'var(--accent)' }}>{t('contacts.call')}</a>
-              <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
-              <a href={`sms:${unifyPhoneNo(activeActionSheet.number)}`} className="block w-full text-center py-4 font-semibold text-lg" style={{ color: 'var(--accent)' }}>{t('contacts.message')}</a>
-              <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
-              <button onClick={() => { setEditingContact(activeActionSheet); setIsModalOpen(true); setActiveActionSheet(null); }} className="block w-full text-center py-4 font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>{t('contacts.edit')}</button>
-              <div className="h-px mx-4" style={{ backgroundColor: 'var(--separator)' }} />
-              <button onClick={() => handleDelete(activeActionSheet.shortcut)} className="block w-full text-center py-4 font-semibold text-lg" style={{ color: 'var(--destructive)' }}>{t('contacts.delete')}</button>
+              <div className="h-[0.5px] ml-4" style={{ backgroundColor: 'var(--separator)' }} />
+              <a href={`tel:${unifyPhoneNo(activeActionSheet.number)}`} className="block w-full text-center py-3.5 font-medium text-[17px]" style={{ color: 'var(--accent)' }}>{t('contacts.call')}</a>
+              <div className="h-[0.5px] ml-4" style={{ backgroundColor: 'var(--separator)' }} />
+              <a href={`sms:${unifyPhoneNo(activeActionSheet.number)}`} className="block w-full text-center py-3.5 font-medium text-[17px]" style={{ color: 'var(--accent)' }}>{t('contacts.message')}</a>
+              <div className="h-[0.5px] ml-4" style={{ backgroundColor: 'var(--separator)' }} />
+              <button onClick={() => { setEditingContact(activeActionSheet); setIsModalOpen(true); setActiveActionSheet(null); }} className="block w-full text-center py-3.5 font-medium text-[17px]" style={{ color: 'var(--text-primary)' }}>{t('contacts.edit')}</button>
+              <div className="h-[0.5px] ml-4" style={{ backgroundColor: 'var(--separator)' }} />
+              <button onClick={() => handleDelete(activeActionSheet.shortcut)} className="block w-full text-center py-3.5 font-medium text-[17px]" style={{ color: 'var(--destructive)' }}>{t('contacts.delete')}</button>
             </div>
-            <button onClick={() => setActiveActionSheet(null)} className="w-full py-4 font-bold text-lg rounded-2xl" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>Zrušit</button>
+            <button onClick={() => setActiveActionSheet(null)} className="w-full py-3.5 font-semibold text-[17px] rounded-full" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)' }}>{t('common.cancel')}</button>
           </div>
         </div>,
         document.body

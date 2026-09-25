@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- The mobile bottom navigation is now an iOS 26+ style floating "Liquid Glass" tab bar: a
+  translucent, blurred capsule inset from the screen edges and sitting inside the home-indicator
+  area, with a sliding pill highlighting the selected tab (the "More" tab lights up when the
+  current screen lives in its menu). The "More" menu opens as a matching floating glass panel
+  above the tab bar instead of a full-width bottom sheet. Every page leaves free space at the end
+  so its last items can always be scrolled above the floating bar. Works in both light and dark
+  mode and respects reduced-motion settings.
+- The rest of the UI follows the current iOS look more closely: large 34 pt page titles; inset
+  grouped lists with larger rounded corners, no borders or shadows, hairline separators inset to
+  the text column and a tap highlight on rows; capsule-shaped primary and secondary buttons,
+  filters and search fields (with a magnifier icon); menu-style pickers in Settings; action sheet,
+  contact editor and detail dialogs as floating rounded sheets; lighter labels instead of tiny
+  black uppercase ones; and a mobile header without the hairline and shadow. In dark mode the page
+  background is now true black and inner fills are lighter than the cards they sit on, so cards,
+  avatars and inputs no longer blend into each other. The action sheet's cancel button is now
+  translated instead of always showing Czech "Zrušit".
+- The app icon SVG is minified (same look, smaller file).
+
+### Removed
+- Unused components `Calls`, `Sms`, `OutgoingSms` and `SimCards` (not referenced anywhere since
+  their features moved into Activity and Lines).
+- The GitHub funding links (`.github/FUNDING.yml`).
+
+### Fixed
+- The balance in the header no longer shows raw API error text (e.g. "error authentication_failed
+  Kč"). The Odorik API returns some errors with HTTP 200, so a balance response is now only
+  accepted when it is a number; anything else is treated as an error (an authentication failure
+  logs the user out as intended). Error strings cached as the balance by earlier versions are
+  ignored, and a missing balance is shown as "—" instead of a bare "Kč".
+- `/.well-known/security.txt` returned 404 on GitHub Pages: Jekyll skips dot-directories, so
+  `make build` now always creates `docs/.nojekyll` to turn Jekyll off.
+
 ## [1.1.1] - 2026-08-17
 
 ### Changed

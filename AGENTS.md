@@ -17,7 +17,7 @@ Odorik Dash is a modernization of the original PWA app. Built on React 19 + Type
 ## Directory Structure
 ```
 src/
-├── components/        # React components (Contacts, Calls, Sms, Activity, ...)
+├── components/        # React components (Contacts, Activity, Callback, SendSms, ...)
 ├── hooks/             # Custom React hooks (useBalance, useContacts, useActivity, ...)
 ├── i18n/              # Internationalization (11 languages)
 │   └── locales/       # EDIT LOCALIZATIONS HERE (cs, en, de, es, fr, it, pl, pt, sk, uk, vi)
@@ -118,7 +118,7 @@ clearAllCaches(): Promise<void>                   // Clear all cache
 4. **API calls**: Abstraction in `api.ts`
 5. **Errors**: Propagate to UI, log to console
 6. **Tests**: `npm run test` or `make test`
-7. **Build**: `npm run build` or `make build`
+7. **Build**: `make build` (not plain `npm run build` - Vite empties `docs/`, and only `make build` copies back locales, `.well-known/security.txt`, `CNAME` and creates `.nojekyll`)
 8. **API Documentation**: If `openapi.yaml` doesn't match actual API behavior, fix it automatically without asking.
 9. **Commits**: Never commit automatically - only when explicitly requested by user.
 10. **Code Formatting**: Use `.editorconfig` - enables EditorConfig support in your IDE (VS Code: EditorConfig extension, IntelliJ: native support)

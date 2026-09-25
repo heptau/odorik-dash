@@ -728,12 +728,18 @@ paths:
       summary: Vrací aktuální kredit uživatele v Kč zaokrouhlený na dvě desetinná místa
       responses:
         200:
-          description: OK
+          description: >-
+            OK. Note: invalid credentials are also answered with HTTP 200 and an error
+            string in the body (e.g. `error authentication_failed`) instead of the number.
           content:
             text/plain:
               schema:
                 type: string
-              example: "193.32"
+              examples:
+                balance:
+                  value: "193.32"
+                authentication_failed:
+                  value: error authentication_failed
         401:
           description: Unauthenticated
           content:

@@ -12,6 +12,10 @@
 		--bg-secondary: #f2f2f7;
 		--bg-tertiary: #e5e5ea;
 		--bg-tinted: rgba(0, 122, 255, 0.1);
+		/* Page background behind inset grouped lists (systemGroupedBackground) */
+		--bg-grouped: #f2f2f7;
+		/* Fill for search fields and controls (tertiarySystemFill) */
+		--fill: rgba(118, 118, 128, 0.12);
 		
 		--text-primary: #000000;
 		--text-secondary: #3c3c43;
@@ -35,14 +39,25 @@
 		--shadow-strong: rgba(0, 0, 0, 0.2);
 		
 		--blur-bg: rgba(255, 255, 255, 0.72);
+
+		/* Liquid Glass (iOS 26+) */
+		--glass-bg: rgba(255, 255, 255, 0.62);
+		--glass-border: rgba(255, 255, 255, 0.75);
+		--glass-highlight: rgba(255, 255, 255, 0.9);
+		--glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+		--glass-selected: rgba(0, 0, 0, 0.07);
+		--tab-inactive: #1c1c1e;
 	}
 	
 	@media (prefers-color-scheme: dark) {
 		:root {
 			--bg-primary: #000000;
-			--bg-secondary: #1c1c1e;
-			--bg-tertiary: #2c2c2e;
+			/* Inner fills must stay visible on #1c1c1e surfaces */
+			--bg-secondary: #2c2c2e;
+			--bg-tertiary: #3a3a3c;
 			--bg-tinted: rgba(255, 255, 255, 0.1);
+			--bg-grouped: #000000;
+			--fill: rgba(118, 118, 128, 0.24);
 			
 			--text-primary: #ffffff;
 			--text-secondary: #ebebf5;
@@ -62,6 +77,13 @@
 			--shadow-strong: rgba(0, 0, 0, 0.5);
 			
 			--blur-bg: rgba(0, 0, 0, 0.8);
+
+			--glass-bg: rgba(38, 38, 42, 0.58);
+			--glass-border: rgba(255, 255, 255, 0.14);
+			--glass-highlight: rgba(255, 255, 255, 0.22);
+			--glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.3);
+			--glass-selected: rgba(255, 255, 255, 0.12);
+			--tab-inactive: #f2f2f7;
 		}
 	}
 
@@ -73,7 +95,7 @@
 	body {
 		-webkit-tap-highlight-color: transparent;
 		-webkit-touch-callout: none;
-		background-color: var(--bg-secondary);
+		background-color: var(--bg-grouped);
 		color: var(--text-primary);
 		overscroll-behavior-y: none;
 		padding-top: var(--safe-area-inset-top);
@@ -90,6 +112,114 @@
 		backdrop-filter: saturate(180%) blur(20px);
 	}
 	
+	/* iOS 26+ Liquid Glass surface (floating tab bar, sheets) */
+	.liquid-glass {
+		background-color: var(--glass-bg);
+		-webkit-backdrop-filter: saturate(190%) blur(24px);
+		backdrop-filter: saturate(190%) blur(24px);
+		border: 0.5px solid var(--glass-border);
+		box-shadow: inset 0 1px 0 var(--glass-highlight), var(--glass-shadow);
+	}
+
+	/* Floating capsule tab bar, sits inside the home-indicator safe area like on iOS */
+	.glass-tabbar {
+		left: calc(var(--safe-area-inset-left) + 16px);
+		right: calc(var(--safe-area-inset-right) + 16px);
+		bottom: max(calc(var(--safe-area-inset-bottom) - 12px), 12px);
+		height: 62px;
+	}
+
+	.glass-tab-indicator {
+		background-color: var(--glass-selected);
+		transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1), width 0.3s ease;
+	}
+
+	.glass-tab {
+		transition: transform 0.15s ease, color 0.2s ease;
+	}
+
+	.glass-tab:active {
+		transform: scale(0.9);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.glass-tab-indicator, .glass-tab { transition: none; }
+	}
+
+	/* Inset grouped list section (iOS 26+ uses larger, softer corners and no shadow) */
+	.ios-group {
+		background-color: var(--surface);
+		border-radius: 26px;
+		overflow: hidden;
+	}
+
+	/* Rows separated by hairlines inset to the text column, like UITableView */
+	.ios-rows > * {
+		position: relative;
+	}
+
+	.ios-rows > * + *::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: var(--row-inset, 16px);
+		right: 0;
+		height: 0.5px;
+		background-color: var(--separator);
+		pointer-events: none;
+	}
+
+	/* Capsule search field */
+	.ios-search {
+		width: 100%;
+		height: 44px;
+		padding: 0 16px 0 40px;
+		border-radius: 9999px;
+		background-color: var(--fill);
+		color: var(--text-primary);
+		font-size: 17px;
+		outline: none;
+		-webkit-appearance: none;
+		appearance: none;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238e8e93' stroke-width='2.2'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath stroke-linecap='round' d='M15.5 15.5L20 20'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: 14px center;
+		background-size: 18px;
+	}
+
+	.ios-search::placeholder {
+		color: var(--text-tertiary);
+	}
+
+	/* Menu-style picker: plain value with an up/down chevron, no box */
+	.ios-picker {
+		-webkit-appearance: none;
+		appearance: none;
+		background-color: transparent;
+		color: var(--text-secondary);
+		text-align: right;
+		text-align-last: right;
+		padding-right: 20px;
+		outline: none;
+		cursor: pointer;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238e8e93' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 9l4-4 4 4M8 15l4 4 4-4'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: right center;
+		background-size: 16px;
+	}
+
+	/* Tap highlight for list rows */
+	.ios-pressable:active {
+		background-color: var(--fill);
+	}
+
+	/* Capsule control (filters, secondary buttons) */
+	.ios-capsule {
+		border-radius: 9999px;
+		background-color: var(--fill);
+		color: var(--text-primary);
+	}
+
 	/* iOS-style cards */
 	.ios-card {
 		background-color: var(--surface);
@@ -272,4 +402,12 @@
 	.shadow-sm { box-shadow: 0 1px 2px var(--shadow); }
 	.shadow-md { box-shadow: 0 4px 6px -1px var(--shadow); }
 	.shadow-2xl { box-shadow: 0 25px 50px -12px var(--shadow-strong); }
+}
+
+/* Space reserved under page content so the floating mobile tab bar never covers the end of it.
+   Kept outside @layer so Tailwind padding utilities (p-4) on the same element can't override it. */
+@media (max-width: 767px) {
+	.tabbar-spacer {
+		padding-bottom: calc(max(calc(var(--safe-area-inset-bottom) - 12px), 12px) + 62px + 24px);
+	}
 }

@@ -296,8 +296,8 @@ export default function Activity({ activity, loading, loadingMore, error, select
 	if (loading) {
 		return (
 			<div className="mb-4">
-				<h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{t('activity.title')}</h2>
-				<div className="rounded-2xl shadow-sm overflow-hidden p-4" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px', borderStyle: 'solid' }}>
+				<h2 className="text-[34px] leading-tight font-bold tracking-tight mb-4" style={{ color: 'var(--text-primary)' }}>{t('activity.title')}</h2>
+				<div className="ios-group p-4">
 					<SkeletonList count={5} />
 				</div>
 			</div>
@@ -306,7 +306,7 @@ export default function Activity({ activity, loading, loadingMore, error, select
 
 	if (error) {
 		return (
-			<div className="bg-red-50 text-red-600 p-5 rounded-2xl border border-red-100 shadow-sm mt-4">
+			<div className="bg-red-50 text-red-600 p-5 rounded-[26px] mt-4">
 				<h3 className="font-bold mb-2 text-lg">{t('common.error')}</h3>
 				<p className="text-sm opacity-90">{error}</p>
 			</div>
@@ -316,13 +316,12 @@ export default function Activity({ activity, loading, loadingMore, error, select
 	return (
 		<>
 			<div className="mb-4 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
-				<h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{t('activity.title')}</h2>
+				<h2 className="text-[34px] leading-tight font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>{t('activity.title')}</h2>
 				<div className="flex gap-2">
 					{activity.length > 0 && (
 						<button
 							onClick={exportToCsv}
-							className="px-4 py-2.5 rounded-2xl text-sm font-medium transition-colors btn-press"
-							style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)', borderColor: 'var(--separator)', borderWidth: '1px' }}
+							className="px-4 py-2.5 ios-capsule text-sm font-medium transition-colors btn-press"
 						>
 							<svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -335,8 +334,8 @@ export default function Activity({ activity, loading, loadingMore, error, select
 					<select
 						value={selectedType}
 						onChange={(e) => onTypeChange(e.target.value as FilterType)}
-						className="min-w-[120px] px-4 py-2.5 rounded-2xl text-sm font-medium border outline-none appearance-none cursor-pointer"
-						style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--separator)', color: 'var(--text-primary)', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px' }}
+						className="min-w-[120px] pl-4 pr-9 py-2.5 ios-capsule text-sm font-medium outline-none appearance-none cursor-pointer"
+						style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', backgroundSize: '14px' }}
 					>
 						<option value="all">{t('filter.all')}</option>
 						<option value="calls">{t('filter.calls')}</option>
@@ -346,8 +345,8 @@ export default function Activity({ activity, loading, loadingMore, error, select
 						<select
 							value={selectedLine}
 							onChange={(e) => onLineChange(e.target.value)}
-							className="min-w-[120px] px-4 py-2.5 rounded-2xl text-sm font-medium border outline-none appearance-none cursor-pointer"
-							style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--separator)', color: 'var(--text-primary)', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px' }}
+							className="min-w-[120px] pl-4 pr-9 py-2.5 ios-capsule text-sm font-medium outline-none appearance-none cursor-pointer"
+							style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', backgroundSize: '14px' }}
 						>
 							<option value="">{t('filter.all_lines')}</option>
 							{lines.map(line => (
@@ -365,13 +364,12 @@ export default function Activity({ activity, loading, loadingMore, error, select
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
 						placeholder={t('activity.search')}
-						className="w-full px-4 py-2.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-						style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', color: 'var(--text-primary)' }}
+						className="ios-search"
 					/>
 				</div>
 			)}
 
-			<div className="rounded-2xl shadow-sm divide-y overflow-hidden mb-6" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px', borderStyle: 'solid' }}>
+			<div className="ios-group ios-rows mb-6" style={{ '--row-inset': '68px' } as React.CSSProperties}>
 				{filtered.length === 0 ? (
 					<div className="p-8 text-center" style={{ color: 'var(--text-secondary)' }}>
 						{search ? t('activity.no_results') : t('activity.empty')}
@@ -395,8 +393,7 @@ export default function Activity({ activity, loading, loadingMore, error, select
 							<div
 								key={`call-${c.id}`}
 								onClick={() => setSelectedItem(c)}
-								className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors cursor-pointer hover:opacity-80"
-								style={{ borderBottomColor: 'var(--separator)', borderBottomWidth: '1px', borderBottomStyle: 'solid' }}
+								className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors cursor-pointer hover:opacity-80 ios-pressable"
 							>
 								<div className="flex items-center gap-3 md:gap-4">
 									<div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0`} style={iconBg}>
@@ -497,8 +494,7 @@ export default function Activity({ activity, loading, loadingMore, error, select
 							<div
 								key={`sms-${s.id}`}
 								onClick={() => setSelectedItem(s)}
-								className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors cursor-pointer hover:opacity-80"
-								style={{ borderBottomColor: 'var(--separator)', borderBottomWidth: '1px', borderBottomStyle: 'solid' }}
+								className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors cursor-pointer hover:opacity-80 ios-pressable"
 							>
 								<div className="flex items-center gap-3 md:gap-4">
 									<div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--accent)' }}>
@@ -592,38 +588,38 @@ export default function Activity({ activity, loading, loadingMore, error, select
 				<button
 					onClick={onLoadMore}
 					disabled={loadingMore}
-					className="w-full py-4 border rounded-2xl font-semibold transition-all disabled:opacity-50 mb-10"
-					style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', color: 'var(--text-secondary)' }}
+					className="w-full py-3.5 rounded-full font-semibold transition-all disabled:opacity-50 mb-10"
+					style={{ backgroundColor: 'var(--surface)', color: 'var(--accent)' }}
 				>
 					{loadingMore ? t('common.loading') : t('activity.load_more')}
 				</button>
 			)}
 		{selectedItem && createPortal(
 			<div
-				className="fixed inset-0 z-50 flex items-center justify-center p-4"
-				style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+				className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-2 md:p-4 pb-[max(env(safe-area-inset-bottom),8px)]"
+				style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}
 				onClick={() => setSelectedItem(null)}
 			>
 				<div
-					className="rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden"
-					style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px' }}
+					className="rounded-[34px] w-full max-w-md max-h-[80vh] overflow-hidden"
+					style={{ backgroundColor: 'var(--surface)' }}
 					onClick={(e) => e.stopPropagation()}
 				>
-					<div className="p-4 flex justify-between items-center" style={{ borderBottom: '0.5px solid var(--separator)' }}>
+					<div className="px-5 pt-5 pb-2 flex justify-between items-center">
 						<h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
 							{selectedItem.type === 'call' ? (selectedItem as unknown as { destination_name?: string }).destination_name || translate('Call') : translate('SMS')}
 						</h3>
 						<button
 							onClick={() => setSelectedItem(null)}
-							className="p-2 rounded-full transition-colors"
-							style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}
+							className="w-9 h-9 flex items-center justify-center rounded-full transition-colors"
+							style={{ backgroundColor: 'var(--fill)', color: 'var(--text-secondary)' }}
 						>
 							<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
 							</svg>
 						</button>
 					</div>
-					<div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 120px)' }}>
+					<div className="px-5 pb-5 pt-2 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 120px)' }}>
 						{selectedItem.type === 'call' ? (
 							<CallDetail item={selectedItem} lines={lines} translate={translate} t={t} balance={balance} />
 						) : (

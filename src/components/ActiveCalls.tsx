@@ -24,17 +24,16 @@ export default function ActiveCalls({ calls, onHangup, loading }: ActiveCallsPro
 	return (
 		<div className="max-w-4xl mx-auto mb-6">
 			<div
-				className="rounded-2xl shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300"
-				style={{ backgroundColor: 'var(--surface)', borderWidth: '1px', borderColor: 'var(--destructive)' }}
+				className="ios-group animate-in fade-in slide-in-from-top-4 duration-300"
 			>
-				<div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: 'var(--separator)' }}>
+				<div className="px-4 py-3 flex items-center gap-2" style={{ borderBottom: '0.5px solid var(--separator)' }}>
 					<div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
 					<h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
 						{t('active_calls.title')} ({calls.length})
 					</h2>
 				</div>
 
-				<div className="divide-y" style={{ borderColor: 'var(--separator)' }}>
+				<div className="ios-rows">
 					{calls.map((call) => (
 						<div
 							key={call.id}
@@ -56,7 +55,7 @@ export default function ActiveCalls({ calls, onHangup, loading }: ActiveCallsPro
 							</div>
 							<button
 								onClick={() => onHangup(call.id)}
-								className="px-3 py-1.5 rounded-xl text-sm font-medium transition-colors shrink-0"
+								className="px-3.5 py-1.5 rounded-full text-sm font-semibold transition-colors shrink-0"
 								style={{ backgroundColor: 'var(--destructive)', color: 'white' }}
 							>
 								{t('active_calls.hangup')}

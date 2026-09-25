@@ -193,13 +193,13 @@ function SimDetailModal({
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
 			<div className="absolute inset-0 bg-black/50" onClick={onClose} />
-			<div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl" style={{ backgroundColor: 'var(--surface)' }}>
+			<div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[34px]" style={{ backgroundColor: 'var(--surface)' }}>
 				<div className="sticky top-0 p-5 flex justify-between items-center" style={{ backgroundColor: 'var(--surface)', borderBottomColor: 'var(--separator)', borderBottomWidth: '0.5px' }}>
 					<div>
-						<h2 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{line.name}</h2>
+						<h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{line.name}</h2>
 						<p className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>ID {line.id}</p>
 					</div>
-					<button onClick={onClose} className="p-2 rounded-xl hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+					<button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full hover:opacity-80" style={{ backgroundColor: 'var(--fill)' }}>
 						<svg className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
 						</svg>
@@ -208,7 +208,7 @@ function SimDetailModal({
 
 				<div className="p-5 space-y-5">
 					<div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-						<p className="text-xs font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Telefonní číslo</p>
+						<p className="text-xs font-medium mb-1" style={{ color: 'var(--text-tertiary)' }}>Telefonní číslo</p>
 						<p className="text-lg font-bold tabular-nums" style={{ color: 'var(--text-primary)' }}>
 							{localSim ? unifyPhoneNo(localSim.phone_number) : unifyPhoneNo(line.caller_id || '')}
 						</p>
@@ -217,7 +217,7 @@ function SimDetailModal({
 					{localSim && (
 						<>
 							{hasChangesInProgress && (
-								<div className="p-3 rounded-xl flex items-center gap-2 text-sm" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', borderColor: 'var(--separator)', borderWidth: '1px' }}>
+								<div className="p-3 rounded-xl flex items-center gap-2 text-sm" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)' }}>
 									<svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
 									</svg>
@@ -227,34 +227,34 @@ function SimDetailModal({
 
 							<div className="grid grid-cols-2 gap-3">
 								<div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-									<p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Stav</p>
+									<p className="text-xs font-medium mb-1" style={{ color: 'var(--text-tertiary)' }}>Stav</p>
 									<p className="text-sm font-bold" style={{ color: localSim.state === 'active' ? 'var(--success)' : 'var(--destructive)' }}>
 										{localSim.state === 'active' ? 'Aktivní' : 'Pozastavena'}
 									</p>
 								</div>
 								<div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-									<p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Roaming</p>
+									<p className="text-xs font-medium mb-1" style={{ color: 'var(--text-tertiary)' }}>Roaming</p>
 									<p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{roamingLabel(localSim.roaming)}</p>
 								</div>
 							</div>
 
 							<div className="grid grid-cols-2 gap-3">
 								<div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-									<p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Data teď</p>
+									<p className="text-xs font-medium mb-1" style={{ color: 'var(--text-tertiary)' }}>Data teď</p>
 									<p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{formatPackageName(localSim.data_package)}</p>
 								</div>
 								<div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-									<p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Data další</p>
+									<p className="text-xs font-medium mb-1" style={{ color: 'var(--text-tertiary)' }}>Data další</p>
 									<p className="text-sm font-bold" style={{ color: localSim.data_package_for_next_month !== localSim.data_package ? 'var(--accent)' : 'var(--text-primary)' }}>
 										{formatPackageName(localSim.data_package_for_next_month)}
 									</p>
 								</div>
 								<div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-									<p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Hlas teď</p>
+									<p className="text-xs font-medium mb-1" style={{ color: 'var(--text-tertiary)' }}>Hlas teď</p>
 									<p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{formatPackageName(localSim.voice_package)}</p>
 								</div>
 								<div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-									<p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Hlas další</p>
+									<p className="text-xs font-medium mb-1" style={{ color: 'var(--text-tertiary)' }}>Hlas další</p>
 									<p className="text-sm font-bold" style={{ color: localSim.voice_package_for_next_month !== localSim.voice_package ? 'var(--accent)' : 'var(--text-primary)' }}>
 										{formatPackageName(localSim.voice_package_for_next_month)}
 									</p>
@@ -273,7 +273,7 @@ function SimDetailModal({
 										<button
 											onClick={handleRestart}
 											disabled={saving}
-											className="mt-3 w-full py-2 rounded-lg text-sm font-bold hover:opacity-90 active:scale-[0.99] transition-all"
+											className="mt-3 w-full py-2.5 rounded-full text-sm font-semibold hover:opacity-90 active:scale-[0.99] transition-all"
 											style={{ backgroundColor: 'var(--accent)', color: 'white' }}
 										>
 											{saving ? '...' : 'Restart dat'}
@@ -307,7 +307,7 @@ function SimDetailModal({
 							</div>
 
 							<div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-								<p className="text-[9px] font-black uppercase tracking-widest mb-2" style={{ color: 'var(--text-tertiary)' }}>ICCID</p>
+								<p className="text-xs font-medium mb-2" style={{ color: 'var(--text-tertiary)' }}>ICCID</p>
 								<p className="font-mono text-xs tracking-wider break-all" style={{ color: 'var(--text-secondary)' }}>
 									{localSim.sim_number}
 								</p>
@@ -410,15 +410,15 @@ export default function Lines({ creds }: { creds: OdorikCredentials }) {
 	if (loading && lines.length === 0) {
 		return (
 			<div className="space-y-6 animate-in fade-in duration-500">
-				<div className="flex justify-between items-center p-5 rounded-2xl mb-6" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px' }}>
+				<div className="flex justify-between items-center mb-2">
 					<div>
-						<h2 className="text-2xl font-black tracking-tight font-display" style={{ color: 'var(--text-primary)' }}>{t('lines.title')}</h2>
+						<h2 className="text-[34px] leading-tight font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>{t('lines.title')}</h2>
 						<p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{t('common.loading')}</p>
 					</div>
 				</div>
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 					{Array.from({ length: 4 }).map((_, i) => (
-						<div key={i} className="p-4 rounded-2xl h-48 animate-pulse" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px' }} />
+						<div key={i} className="p-4 rounded-[26px] h-48 animate-pulse" style={{ backgroundColor: 'var(--surface)' }} />
 					))}
 				</div>
 			</div>
@@ -427,10 +427,10 @@ export default function Lines({ creds }: { creds: OdorikCredentials }) {
 
 	return (
 		<div className="space-y-6 animate-in fade-in duration-500">
-			<div className="flex justify-between items-center p-5 rounded-2xl mb-6" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px' }}>
+			<div className="flex justify-between items-center mb-2">
 				<div>
-					<h2 className="text-2xl font-black tracking-tight font-display" style={{ color: 'var(--text-primary)' }}>{t('lines.title')}</h2>
-					<p className="text-sm font-medium">
+					<h2 className="text-[34px] leading-tight font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>{t('lines.title')}</h2>
+					<p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
 						{lastUpdated
 							? `${t('lines.last_updated')} ${formatLastUpdated(lastUpdated)}`
 							: t('lines.subtitle')}
@@ -439,19 +439,19 @@ export default function Lines({ creds }: { creds: OdorikCredentials }) {
 				<button
 					onClick={() => fetchAndCache(true)}
 					disabled={loading}
-					className="p-3 rounded-2xl hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
-					style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', color: 'var(--accent)' }}
+					className="w-11 h-11 flex items-center justify-center rounded-full hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
+					style={{ backgroundColor: 'var(--accent-tint)', color: 'var(--accent)' }}
 					aria-label={t('lines.refresh_aria')}
 					title={isOffline() ? t('lines.offline') : t('lines.refresh')}
 				>
-					<svg className={`w-6 h-6 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<svg className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
 					</svg>
 				</button>
 			</div>
 
 			{isOffline() && (
-				<div className="text-amber-700 px-5 py-3 rounded-2xl flex items-center gap-3 text-sm font-semibold" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', borderColor: 'var(--separator)', borderWidth: '1px' }}>
+				<div className="text-amber-700 px-5 py-3 rounded-2xl flex items-center gap-3 text-sm font-semibold" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)' }}>
 					<svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636a9 9 0 010 12.728M15.536 8.464a5 5 0 010 7.072M12 12h.01M8.464 15.536a5 5 0 010-7.072M5.636 18.364a9 9 0 010-12.728" />
 					</svg>
@@ -460,7 +460,7 @@ export default function Lines({ creds }: { creds: OdorikCredentials }) {
 			)}
 
 			{error && lines.length === 0 && (
-				<div className="text-red-600 p-5 rounded-2xl flex items-center gap-4" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--separator)', borderWidth: '1px' }}>
+				<div className="text-red-600 p-5 rounded-2xl flex items-center gap-4" style={{ backgroundColor: 'var(--bg-secondary)' }}>
 					<svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 					</svg>
@@ -468,7 +468,7 @@ export default function Lines({ creds }: { creds: OdorikCredentials }) {
 				</div>
 			)}
 			{error && lines.length > 0 && (
-				<div className="text-red-600 px-5 py-3 rounded-2xl flex items-center gap-3 text-sm font-semibold" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'var(--separator)', borderWidth: '1px' }}>
+				<div className="text-red-600 px-5 py-3 rounded-2xl flex items-center gap-3 text-sm font-semibold" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)' }}>
 					<svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 					</svg>
@@ -485,8 +485,8 @@ export default function Lines({ creds }: { creds: OdorikCredentials }) {
 						<button
 							key={line.id}
 							onClick={() => handleSelect(line)}
-							className="text-left p-4 rounded-2xl hover:opacity-90 active:scale-[0.99] transition-all"
-							style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px' }}
+							className="text-left p-4 rounded-[26px] hover:opacity-90 active:scale-[0.99] transition-all"
+							style={{ backgroundColor: 'var(--surface)' }}
 						>
 							<div className="flex justify-between items-start mb-3">
 								<div className="min-w-0">

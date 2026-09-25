@@ -628,11 +628,18 @@ export const fetchLines = async (creds: OdorikCredentials, options?: RetryOption
   }, options);
 };
 
+// The API answers some failures (e.g. "error authentication_failed") with HTTP 200 and the
+// error in the body, so only a plain number counts as a balance.
+export const isValidBalance = (value: string): boolean => /^-?\d+(\.\d+)?$/.test(value.trim());
+
 export const fetchBalance = async (creds: OdorikCredentials, options?: RetryOptions): Promise<string> => {
   return withRetry(async () => {
     const response = await fetch(`https://www.odorik.cz/api/v1/balance?user=${creds.user}&password=${creds.pass}`);
-    if (!response.ok) throw new Error('Chyba při načítání kreditu');
-    return response.text();
+    const text = (await response.text()).trim();
+    if (!response.ok || !isValidBalance(text)) {
+      throw new Error(text || 'Chyba při načítání kreditu');
+    }
+    return text;
   }, options);
 };
 

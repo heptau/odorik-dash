@@ -22,14 +22,14 @@ function StatsCard({ title, value, subtitle, icon, color = 'blue' }: StatsCardPr
 	};
 
 	return (
-		<div className="p-4 rounded-2xl" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px' }}>
+		<div className="p-4 rounded-[26px]" style={{ backgroundColor: 'var(--surface)' }}>
 			<div className="flex items-center gap-3 mb-2">
 				<div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: colors[color].bg, color: colors[color].text }}>
 					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon}></path></svg>
 				</div>
 				<span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{title}</span>
 			</div>
-			<div className="text-3xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>{value}</div>
+			<div className="text-3xl font-bold tracking-tight tabular-nums" style={{ color: 'var(--text-primary)' }}>{value}</div>
 			{subtitle && <div className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>{subtitle}</div>}
 		</div>
 	);
@@ -101,7 +101,7 @@ export default function Statistics({ creds }: { creds: OdorikCredentials }) {
 
 	return (
 		<div className="mb-4">
-			<h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{t('statistics.title')}</h2>
+			<h2 className="text-[34px] leading-tight font-bold tracking-tight mb-2" style={{ color: 'var(--text-primary)' }}>{t('statistics.title')}</h2>
 			<p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>{t('statistics.this_month')}</p>
 
 			<div className="grid grid-cols-2 gap-3 mb-6">
@@ -136,15 +136,15 @@ export default function Statistics({ creds }: { creds: OdorikCredentials }) {
 			</div>
 
 			{stats.topLines.length > 0 && (
-				<div className="p-4 rounded-2xl" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px' }}>
+				<div className="p-4 rounded-[26px]" style={{ backgroundColor: 'var(--surface)' }}>
 					<h3 className="text-base font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>{t('statistics.top_lines')}</h3>
 					<div className="space-y-3">
 						{stats.topLines.map(([lineId, count]) => {
 							const line = lines.find(l => String(l.id) === String(lineId));
 							return (
-								<div key={lineId} className="flex items-center justify-between py-2" style={{ borderBottomColor: 'var(--separator)', borderBottomWidth: '1px', borderBottomStyle: 'solid' }}>
+								<div key={lineId} className="flex items-center justify-between py-2" style={{ borderBottom: '0.5px solid var(--separator)' }}>
 									<div className="flex items-center gap-3 min-w-0">
-										<span className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0" style={{ backgroundColor: 'var(--accent)', color: 'white' }}>
+										<span className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0" style={{ backgroundColor: 'var(--accent)', color: 'white' }}>
 											{count}
 										</span>
 										<span className="text-base font-medium truncate" style={{ color: 'var(--text-primary)' }}>{line?.name || lineId} <span style={{ color: 'var(--text-tertiary)' }}>({lineId})</span></span>
@@ -158,7 +158,7 @@ export default function Statistics({ creds }: { creds: OdorikCredentials }) {
 			)}
 
 			{activity.length === 0 && (
-				<div className="p-8 rounded-2xl text-center" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--separator)', borderWidth: '1px', color: 'var(--text-secondary)' }}>
+				<div className="p-8 rounded-[26px] text-center" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-secondary)' }}>
 					<p>{t('statistics.no_data')}</p>
 				</div>
 			)}

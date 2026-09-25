@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { splitPhoneNo, unifyPhoneNo, parseContactName, buildContactName, lookupContact, isInternalPhone, lookupLineByNumber, lookupLineById, lookupContactOrLine, SURNAME_MARKER, NOTE_MARKER, EMPTY_NAME_PLACEHOLDER } from './api';
+import { isValidBalance, splitPhoneNo, unifyPhoneNo, parseContactName, buildContactName, lookupContact, isInternalPhone, lookupLineByNumber, lookupLineById, lookupContactOrLine, SURNAME_MARKER, NOTE_MARKER, EMPTY_NAME_PLACEHOLDER } from './api';
 
 describe('splitPhoneNo', () => {
   it('should split Czech phone number with +420 prefix', () => {
@@ -292,5 +292,20 @@ describe('lookupContactOrLine', () => {
   it('should return undefined for non-existent number', () => {
     const result = lookupContactOrLine('+420999999999', contacts, lines);
     expect(result).toBeUndefined();
+  });
+});
+
+describe('isValidBalance', () => {
+  it('should accept numeric balances', () => {
+    expect(isValidBalance('193.32')).toBe(true);
+    expect(isValidBalance('0')).toBe(true);
+    expect(isValidBalance('-12.5')).toBe(true);
+    expect(isValidBalance(' 42.10\n')).toBe(true);
+  });
+
+  it('should reject API error strings and empty values', () => {
+    expect(isValidBalance('error authentication_failed')).toBe(false);
+    expect(isValidBalance('errors authentication_required')).toBe(false);
+    expect(isValidBalance('')).toBe(false);
   });
 });

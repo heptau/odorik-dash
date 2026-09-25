@@ -19,10 +19,12 @@ const SettingsLazy = lazy(() => import('./components/Settings').then(m => ({ def
 import { loadCredentials, clearCredentials, clearAllCaches } from './api';
 import type { OdorikCredentials } from './api';
 
+type Tab = 'contacts' | 'activity' | 'callback' | 'send_sms' | 'lines' | 'statistics' | 'settings';
+
 function App() {
 	const [creds, setCreds] = useState<OdorikCredentials | null>(null);
 	const [loading, setLoading] = useState(true);
-	const [activeTab, setActiveTab] = useState<'contacts' | 'activity' | 'callback' | 'send_sms' | 'lines' | 'statistics' | 'settings'>('contacts');
+	const [activeTab, setActiveTab] = useState<Tab>('contacts');
 	const [showMoreMenu, setShowMoreMenu] = useState(false);
 	const [visibleNavItems, setVisibleNavItems] = useState(5);
 	const t = useT();
@@ -95,6 +97,21 @@ function App() {
 		return <Login onLogin={setCreds} />;
 	}
 
+	const navItems: { id: Tab; label: string; icon: string }[] = [
+		{ id: 'contacts', label: t('nav.contacts'), icon: 'M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2' },
+		{ id: 'callback', label: t('nav.callback'), icon: 'M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.516l2.257-1.13a1 1 0 00.502-1.21L9.284 3.684A1 1 0 008.284 3H5z' },
+		{ id: 'send_sms', label: t('nav.new_sms'), icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
+		{ id: 'activity', label: t('activity.title'), icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+		{ id: 'lines', label: t('nav.lines'), icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' },
+		{ id: 'statistics', label: t('nav.statistics'), icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+		{ id: 'settings', label: t('nav.settings'), icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z' },
+	];
+	const visibleItems = navItems.slice(0, visibleNavItems);
+	const hiddenItems = navItems.slice(visibleNavItems);
+	const moreSelected = hiddenItems.some(item => item.id === activeTab);
+	const tabCount = visibleItems.length + (hiddenItems.length > 0 ? 1 : 0);
+	const activeIndex = moreSelected ? visibleItems.length : visibleItems.findIndex(item => item.id === activeTab);
+
 	const renderContent = () => (
 		<ErrorBoundary>
 			{hasActive && (
@@ -114,7 +131,7 @@ function App() {
 					lines={lines}
 					onLoadMore={loadMore}
 					contacts={contacts}
-					balance={{ amount: balance, currency: 'Kč' }}
+					balance={balance ? { amount: balance, currency: 'Kč' } : undefined}
 				/>
 			)}
 			{activeTab === 'callback' && <Callback creds={creds} />}
@@ -134,7 +151,7 @@ function App() {
 	);
 
 	return (
-		<div className="min-h-screen flex flex-col md:flex-row pb-[env(safe-area-inset-bottom)]" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+		<div className="min-h-screen flex flex-col md:flex-row pb-[env(safe-area-inset-bottom)]" style={{ backgroundColor: 'var(--bg-grouped)' }}>
 			<OfflineIndicator />
 			{/* SIDEBAR - DESKTOP */}
 			<aside className="hidden md:flex w-72 flex-col sticky top-0 h-screen p-6 shadow-sm z-10" style={{ backgroundColor: 'var(--surface)', borderRightColor: 'var(--separator)' }}>
@@ -149,7 +166,7 @@ function App() {
 						<div>
 							<span className="text-[11px] font-semibold uppercase tracking-widest leading-none block mb-1" style={{ color: 'var(--text-tertiary)' }}>{t('balance.credit')}</span>
 						<span className={`text-xl font-bold ${parseFloat(balance) < 50 ? 'text-red-600' : ''}`} style={{ color: parseFloat(balance) < 50 ? 'var(--destructive)' : 'var(--text-primary)' }}>
-								{balanceLoading ? '...' : `${balance} Kč`}
+								{balanceLoading ? '...' : balance ? `${balance} Kč` : '—'}
 							</span>
 						</div>
 						<button
@@ -214,18 +231,18 @@ function App() {
 			<div className="md:hidden fixed top-0 left-0 right-0 blur-bg z-40" style={{ height: 'env(safe-area-inset-top)' }} />
 
 			{/* MOBILE HEADER */}
-			<header className="md:hidden sticky blur-bg border-b flex items-center justify-between px-6 py-4 z-40 shadow-sm" style={{ top: 'env(safe-area-inset-top)', borderBottomColor: 'var(--separator)' }}>
+			<header className="md:hidden sticky blur-bg flex items-center justify-between px-6 py-4 z-40" style={{ top: 'env(safe-area-inset-top)' }}>
 				<div className="flex items-center gap-2">
 					<div className="w-8 h-8 rounded-xl flex items-center justify-center shadow-lg" style={{ backgroundColor: 'var(--accent)', boxShadow: '0 4px 12px var(--shadow)' }}>
 						<svg className="w-5 h-5" style={{ color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
 					</div>
-					<h1 className="text-lg font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>Odorik Dash</h1>
+					<h1 className="text-[17px] font-semibold" style={{ color: 'var(--text-primary)' }}>Odorik Dash</h1>
 				</div>
 
 				<div className="flex flex-col items-end">
 					<div className="flex items-center gap-2">
-						<span className="text-md font-black" style={{ color: parseFloat(balance) < 50 ? 'var(--destructive)' : 'var(--text-primary)' }}>
-							{balanceLoading ? '...' : `${balance} Kč`}
+						<span className="text-[17px] font-semibold tabular-nums" style={{ color: parseFloat(balance) < 50 ? 'var(--destructive)' : 'var(--text-primary)' }}>
+							{balanceLoading ? '...' : balance ? `${balance} Kč` : '—'}
 						</span>
 						<button
 							onClick={() => refreshBalance(true)}
@@ -236,12 +253,12 @@ function App() {
 							<svg className={`w-3.5 h-3.5 ${balanceLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
 						</button>
 					</div>
-					<span className="text-[9px] font-black uppercase tracking-widest leading-none" style={{ color: 'var(--text-tertiary)' }}>{t('balance.credit')}</span>
+					<span className="text-[11px] font-medium leading-none" style={{ color: 'var(--text-tertiary)' }}>{t('balance.credit')}</span>
 				</div>
 			</header>
 
 			{/* MAIN CONTENT AREA */}
-			<main className="flex-1 p-4 md:p-8 md:p-12 mb-16 md:mb-0 md:overflow-auto">
+			<main className="flex-1 p-4 tabbar-spacer md:p-12 md:overflow-auto">
 				<PullToRefresh onRefresh={async () => window.location.reload()}>
 					<div className="max-w-6xl mx-auto">
 						{renderContent()}
@@ -249,84 +266,75 @@ function App() {
 				</PullToRefresh>
 			</main>
 
-			{/* MOBILE BOTTOM NAVIGATION */}
-			<nav className="md:hidden fixed bottom-0 left-0 right-0 blur-bg border-t flex justify-around safe-bottom z-50 pb-[env(safe-area-inset-bottom)]" style={{ borderTopColor: 'var(--separator)', backgroundColor: 'var(--surface)' }}>
-				{(() => {
-					const navItems: { id: string; label: string; icon: string }[] = [
-						{ id: 'contacts', label: t('nav.contacts'), icon: 'M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2' },
-						{ id: 'callback', label: t('nav.callback'), icon: 'M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.516l2.257-1.13a1 1 0 00.502-1.21L9.284 3.684A1 1 0 008.284 3H5z' },
-						{ id: 'send_sms', label: t('nav.new_sms'), icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
-						{ id: 'activity', label: t('activity.title'), icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
-						{ id: 'lines', label: t('nav.lines'), icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' },
-						{ id: 'statistics', label: t('nav.statistics'), icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
-						{ id: 'settings', label: t('nav.settings'), icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z' },
-					];
-					const visibleItems = navItems.slice(0, visibleNavItems);
-					const hiddenItems = navItems.slice(visibleNavItems);
+			{/* MOBILE BOTTOM NAVIGATION - floating Liquid Glass tab bar (iOS 26+) */}
+			<nav className="md:hidden fixed glass-tabbar liquid-glass rounded-full z-50 flex items-stretch p-1">
+				{activeIndex >= 0 && (
+					<div
+						aria-hidden="true"
+						className="glass-tab-indicator absolute top-1 bottom-1 left-1 rounded-full pointer-events-none"
+						style={{ width: `calc((100% - 0.5rem) / ${tabCount})`, transform: `translateX(${activeIndex * 100}%)` }}
+					/>
+				)}
+				{visibleItems.map(item => {
+					const selected = activeTab === item.id;
 					return (
-						<>
-							{visibleItems.map(item => (
-								<button key={item.id} onClick={() => setActiveTab(item.id as typeof activeTab)} className={`flex-1 py-1.5 flex flex-col items-center justify-center transition-opacity`} style={{ color: activeTab === item.id ? 'var(--accent)' : 'var(--text-tertiary)' }}>
-									<svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={item.icon}></path></svg>
-									<span className="text-[9px] font-medium leading-none">{item.label}</span>
-								</button>
-							))}
-							{hiddenItems.length > 0 && (
-								<button onClick={() => setShowMoreMenu(true)} aria-label={t('nav.more')} className={`flex-1 py-1.5 flex flex-col items-center justify-center transition-opacity`} style={{ color: 'var(--text-tertiary)' }}>
-									<svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-									<span className="text-[9px] font-medium leading-none">{t('nav.more')}</span>
-								</button>
-							)}
-						</>
+						<button
+							key={item.id}
+							onClick={() => setActiveTab(item.id)}
+							aria-current={selected ? 'page' : undefined}
+							className="glass-tab relative flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 rounded-full"
+							style={{ color: selected ? 'var(--accent)' : 'var(--tab-inactive)' }}
+						>
+							<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={selected ? 2 : 1.7} d={item.icon}></path></svg>
+							<span className="text-[10px] font-semibold leading-none truncate max-w-full px-1">{item.label}</span>
+						</button>
 					);
-				})()}
+				})}
+				{hiddenItems.length > 0 && (
+					<button
+						onClick={() => setShowMoreMenu(true)}
+						aria-label={t('nav.more')}
+						aria-current={moreSelected ? 'page' : undefined}
+						className="glass-tab relative flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 rounded-full"
+						style={{ color: moreSelected ? 'var(--accent)' : 'var(--tab-inactive)' }}
+					>
+						<svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.8" /><circle cx="12" cy="12" r="1.8" /><circle cx="18.5" cy="12" r="1.8" /></svg>
+						<span className="text-[10px] font-semibold leading-none truncate max-w-full px-1">{t('nav.more')}</span>
+					</button>
+				)}
 			</nav>
 
-			{/* MORE MENU MODAL */}
-			{showMoreMenu && (() => {
-				const navItems: { id: string; label: string; icon: string }[] = [
-					{ id: 'contacts', label: t('nav.contacts'), icon: 'M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2' },
-					{ id: 'callback', label: t('nav.callback'), icon: 'M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.516l2.257-1.13a1 1 0 00.502-1.21L9.284 3.684A1 1 0 008.284 3H5z' },
-					{ id: 'send_sms', label: t('nav.new_sms'), icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
-					{ id: 'activity', label: t('activity.title'), icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
-					{ id: 'lines', label: t('nav.lines'), icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' },
-					{ id: 'statistics', label: t('nav.statistics'), icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
-					{ id: 'settings', label: t('nav.settings'), icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z' },
-				];
-				const hiddenItems = navItems.slice(visibleNavItems);
-				return (
-					<div className="md:hidden fixed inset-0 z-50 flex items-end">
-						<div className="absolute inset-0 bg-black/50" onClick={() => setShowMoreMenu(false)} />
-						<div className="relative w-full rounded-t-3xl animate-in slide-in-from-bottom duration-200" style={{ backgroundColor: 'var(--surface)' }}>
-							<div className="p-4 border-b" style={{ borderBottomColor: 'var(--separator)' }}>
-								<div className="w-12 h-1.5 rounded-full mx-auto" style={{ backgroundColor: 'var(--separator)' }} />
-							</div>
-							<div className="p-2">
-								{hiddenItems.map(item => (
-									<button
-										key={item.id}
-										onClick={() => { setActiveTab(item.id as typeof activeTab); setShowMoreMenu(false); }}
-										className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-colors"
-										style={{ color: 'var(--text-primary)' }}
-									>
-										<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon}></path></svg>
-										<span className="font-medium">{item.label}</span>
-									</button>
-								))}
+			{/* MORE MENU - floating glass sheet anchored above the tab bar */}
+			{showMoreMenu && (
+				<div className="md:hidden fixed inset-0 z-50">
+					<div className="absolute inset-0 bg-black/30" onClick={() => setShowMoreMenu(false)} />
+					<div className="glass-tabbar absolute !h-auto liquid-glass rounded-[28px] p-2 animate-in slide-in-from-bottom duration-200" style={{ bottom: 'calc(max(calc(var(--safe-area-inset-bottom) - 12px), 12px) + 70px)' }}>
+						{hiddenItems.map(item => {
+							const selected = activeTab === item.id;
+							return (
 								<button
-									onClick={() => { handleLogout(); setShowMoreMenu(false); }}
-									className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-colors"
-									style={{ color: 'var(--destructive)' }}
+									key={item.id}
+									onClick={() => { setActiveTab(item.id); setShowMoreMenu(false); }}
+									className="w-full flex items-center gap-4 px-4 py-3 rounded-[20px] transition-colors"
+									style={{ color: selected ? 'var(--accent)' : 'var(--text-primary)', backgroundColor: selected ? 'var(--glass-selected)' : 'transparent' }}
 								>
-									<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-									<span className="font-medium">{t('nav.logout')}</span>
+									<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d={item.icon}></path></svg>
+									<span className="font-medium">{item.label}</span>
 								</button>
-							</div>
-							<div className="pb-6"></div>
-						</div>
+							);
+						})}
+						<div className="h-px mx-4 my-1" style={{ backgroundColor: 'var(--glass-selected)' }} />
+						<button
+							onClick={() => { handleLogout(); setShowMoreMenu(false); }}
+							className="w-full flex items-center gap-4 px-4 py-3 rounded-[20px] transition-colors"
+							style={{ color: 'var(--destructive)' }}
+						>
+							<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+							<span className="font-medium">{t('nav.logout')}</span>
+						</button>
 					</div>
-				);
-			})()}
+				</div>
+			)}
 		</div>
 	);
 }
