@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-09-25
+
 ### Changed
 - The mobile bottom navigation is now an iOS 26+ style floating "Liquid Glass" tab bar: a
   translucent, blurred capsule inset from the screen edges and sitting inside the home-indicator
