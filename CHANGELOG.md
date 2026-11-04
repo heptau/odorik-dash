@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.3] - 2026-11-04
+
 ### Security
 - Updated dependencies in `package-lock.json` to patched versions (undici, vite, vitest/@vitest/mocker, brace-expansion, source-map-js, js-yaml, browserslist, baseline-browser-mapping, @humanfs/node, zod), resolving the open Dependabot alerts.
 
