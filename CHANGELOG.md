@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.3] - 2026-11-04
 
 ### Security
-- Updated dependencies in `package-lock.json` to patched versions (undici, vite, vitest/@vitest/mocker, brace-expansion, source-map-js, js-yaml, browserslist, baseline-browser-mapping, @humanfs/node, zod), resolving the open Dependabot alerts.
+- Updated dependencies in `package-lock.json` to patched versions (undici, vite, vitest/@vitest/mocker, brace-expansion, source-map-js, js-yaml, browserslist, baseline-browser-mapping, @humanfs/node, zod), resolving the open Dependabot alerts. `minimatch` (dev-only, pulled in by ESLint) is pinned to `^11.0.1` via `overrides` in `package.json`.
 
 ## [1.1.2] - 2026-09-25
 

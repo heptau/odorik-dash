@@ -2,7 +2,8 @@
 set -euo pipefail
 # =============================================================================
 # prepare_release.sh — Bump VERSION, roll CHANGELOG.md's [Unreleased] section
-#                       into a dated release entry, build production, commit.
+#                       into a dated release entry, build production, commit,
+#                       and tag the commit as vX.Y.Z.
 #
 # Called by: make release VERSION=X.Y.Z
 # =============================================================================
@@ -11,6 +12,11 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$DIR/.."
 
 VERSION="${VERSION:?VERSION is required, e.g. make release VERSION=1.1.0}"
+
+if git rev-parse -q --verify "refs/tags/v${VERSION}" >/dev/null; then
+  echo "Error: git tag v${VERSION} already exists." >&2
+  exit 1
+fi
 
 if grep -q "^## \[${VERSION}\]" CHANGELOG.md; then
   echo "Error: CHANGELOG.md already has an entry for [${VERSION}]. Did you already" >&2
@@ -48,4 +54,8 @@ git add VERSION CHANGELOG.md
 git add -A docs
 git commit -m "chore(release): v${VERSION}"
 
-echo "==> Prepared release v${VERSION} (committed, not pushed)."
+echo "==> Tagging v${VERSION}..."
+git tag -a "v${VERSION}" -m "Release v${VERSION}"
+
+echo "==> Prepared release v${VERSION} (committed and tagged, not pushed)."
+echo "    Push with: git push && git push origin v${VERSION}"

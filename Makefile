@@ -11,7 +11,7 @@ help:
 	@echo "  make status       Show if dev server is running"
 	@echo "  make dev          Start dev server (foreground)"
 	@echo "  make build        Build production version"
-	@echo "  make release VERSION=X.Y.Z   Bump VERSION+CHANGELOG, build, commit"
+	@echo "  make release VERSION=X.Y.Z   Bump VERSION+CHANGELOG, build, commit, tag vX.Y.Z"
 	@echo "  make preview      Preview production build"
 	@echo "  make lint         Run code linting"
 	@echo "  make test         Run tests"
