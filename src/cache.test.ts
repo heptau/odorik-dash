@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   getCacheKey,
   getBalanceCacheKey,
@@ -7,6 +7,8 @@ import {
   CACHE_TTL_1_DAY,
   CACHE_TTL_10_MIN,
   isCacheStale,
+  clearAllCaches,
+  fetchBalance,
 } from './api';
 
 describe('Cache key factories', () => {
@@ -65,5 +67,49 @@ describe('isCacheStale', () => {
       timestamp: Date.now() - CACHE_TTL_10_MIN / 2,
     };
     expect(isCacheStale(entry, CACHE_TTL_10_MIN)).toBe(false);
+  });
+});
+describe('clearAllCaches', () => {
+  let store: Record<string, string>;
+
+  beforeEach(() => {
+    store = {
+      odorik_credentials: 'ciphertext',
+      odorik_device_key: 'key',
+      odorik_locale: 'cs',
+      odorik_calls_testuser: '[]',
+      cache_ttl: '{}',
+    };
+    vi.stubGlobal('localStorage', {
+      get length() { return Object.keys(store).length; },
+      key: (i: number) => Object.keys(store)[i] ?? null,
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => { store[k] = v; },
+      removeItem: (k: string) => { delete store[k]; },
+    });
+  });
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('should remove cached data but keep credentials, device key and language', async () => {
+    await clearAllCaches();
+
+    expect(Object.keys(store).sort()).toEqual(['cache_ttl', 'odorik_credentials', 'odorik_device_key', 'odorik_locale']);
+  });
+});
+
+describe('fetchBalance', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('should URL-encode credentials containing reserved characters', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, text: async () => '123.45' });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const balance = await fetchBalance({ user: '123456', pass: 'p&ss#w=rd +1' }, { retries: 1 });
+
+    expect(balance).toBe('123.45');
+    const url = new URL(fetchMock.mock.calls[0][0] as string);
+    expect(url.searchParams.get('user')).toBe('123456');
+    expect(url.searchParams.get('password')).toBe('p&ss#w=rd +1');
   });
 });

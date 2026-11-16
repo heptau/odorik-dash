@@ -17,10 +17,11 @@ export default function Login({ onLogin }: { onLogin: (creds: OdorikCredentials)
       setError('');
       
       const creds = { user, pass };
-      await saveCredentials(creds);
-      
+
       try {
-        await fetchBalance(creds);
+        // Verify first, so rejected credentials are never stored.
+        await fetchBalance(creds, { retries: 1 });
+        await saveCredentials(creds);
         onLogin(creds);
       } catch (err) {
         setError(err instanceof Error ? err.message : t('errors.unknown'));

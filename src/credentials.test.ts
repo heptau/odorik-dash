@@ -155,6 +155,7 @@ describe('Credential Functions', () => {
       clearCredentials();
       
       expect(store['odorik_credentials']).toBeUndefined();
+      expect(store['odorik_device_key']).toBeUndefined();
     });
 
     it('should not throw when no credentials exist', () => {

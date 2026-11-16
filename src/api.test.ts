@@ -239,17 +239,17 @@ describe('lookupLineByNumber', () => {
   ];
 
   it('should find line by full number with + prefix', () => {
-    const result = lookupLineByNumber('+420777111222', lines as any);
+    const result = lookupLineByNumber('+420777111222', lines);
     expect(result).toEqual(lines[0]);
   });
 
   it('should return undefined for non-existent number', () => {
-    const result = lookupLineByNumber('+420999999999', lines as any);
+    const result = lookupLineByNumber('+420999999999', lines);
     expect(result).toBeUndefined();
   });
 
   it('should return undefined for short numbers', () => {
-    const result = lookupLineByNumber('123', lines as any);
+    const result = lookupLineByNumber('123', lines);
     expect(result).toBeUndefined();
   });
 });
@@ -261,17 +261,17 @@ describe('lookupLineById', () => {
   ];
 
   it('should find line by string id', () => {
-    const result = lookupLineById('1', lines as any);
+    const result = lookupLineById('1', lines);
     expect(result).toEqual(lines[0]);
   });
 
   it('should find line by number id', () => {
-    const result = lookupLineById(2, lines as any);
+    const result = lookupLineById(2, lines);
     expect(result).toEqual(lines[1]);
   });
 
   it('should return undefined for non-existent id', () => {
-    const result = lookupLineById('999', lines as any);
+    const result = lookupLineById('999', lines);
     expect(result).toBeUndefined();
   });
 });
@@ -279,10 +279,10 @@ describe('lookupLineById', () => {
 describe('lookupContactOrLine', () => {
   const contacts = [
     { shortcut: 1, number: '+420777123456', name: 'Contact 1' },
-  ] as any;
+  ];
   const lines = [
     { id: '1', caller_id: '+420777111222', name: 'Line 1' },
-  ] as any;
+  ];
 
   it('should find contact by phone number', () => {
     const result = lookupContactOrLine('+420777123456', contacts, lines);

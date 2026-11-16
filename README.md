@@ -1,7 +1,7 @@
 # Odorik Dash - Progressive Web App
 
 [![GitHub License](https://img.shields.io/github/license/heptau/pgarachne?label=License)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-44%20passed-brightgreen)](https://github.com/heptau/odorik-dash/actions)
+[![Tests](https://img.shields.io/badge/Tests-62%20passed-brightgreen)](https://github.com/heptau/odorik-dash/actions)
 [![PWA](https://img.shields.io/badge/PWA-Installable-blue?logo=pwa)](https://odorik-dash.80.cz)
 
 Modern web application for managing Odorik.cz services (calls, SMS, contacts, credits, SIM cards...).
@@ -73,6 +73,6 @@ npm run build
 
 ### Development
 
-- **Tests**: Vitest + @testing-library/react (32 tests)
+- **Tests**: Vitest + @testing-library/react
 - **Linting**: ESLint with strict TypeScript mode
 - **Type checking**: TypeScript strict mode

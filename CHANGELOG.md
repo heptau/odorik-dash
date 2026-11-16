@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Opening a call or SMS detail in Activity crashed ("Invalid language tag: auto") while the
+  language was set to "Auto" (the default). The detail, the call/SMS labels and the CSV export
+  now use the language that "Auto" resolved to instead of falling back to English.
+- "Clear cache" in Settings also deleted the saved login, its encryption key and the chosen
+  language, so the user was logged out on the next reload. It now removes cached data only.
+- Logging in or loading the balance failed when the password contained characters such as `&`,
+  `#`, `+` or `=`, because the credentials were not URL-encoded in the balance request.
+- Credentials are stored only after they have been verified; a failed login no longer leaves the
+  rejected credentials saved (and no longer waits through three retries before showing the error).
+- The contacts cache was written in a doubly wrapped shape, so cached contacts reached the app as
+  a non-array and contact lookups in Activity (search, detail, CSV export) could crash until the
+  background refresh finished - permanently when offline. Existing cache entries are still read.
+- A call and an SMS with the same ID no longer overwrite each other when activity pages are merged.
+- The active calls panel no longer flickers to "Loading…" on every 5-second poll.
+- Lines no longer stay on the loading skeleton forever when opened offline with an empty cache.
+- The app no longer hangs on the loading spinner when a translation file fails to download (it
+  falls back to English), and quickly switching languages can't end on the wrong one.
+- "Auto" language now follows the whole system language list in order, not just the first entry.
+- The SMS detail shows translated "From"/"To" labels instead of always Czech "Od"/"Na".
+- "Check for updates" in Settings reports when a new version was actually found, and its result
+  is translated instead of always English.
+- Activity requests that fail with an HTTP error or a non-list response now show an error instead
+  of crashing.
+- Wrong flag emoji for the +677 prefix.
+
+### Security
+- SIM card updates no longer write the request, including the account password, to the browser
+  console.
+- Logging out also removes the per-device encryption key.
+
+### Changed
+- The service worker ignores non-GET requests and no longer contains an unreachable
+  `controllerchange` handler.
+- `src/i18n` is split into `context.ts` (hooks, locale detection) and `I18nProvider.tsx`, and
+  the remaining ESLint errors are fixed (`npm run lint` now passes with warnings only).
+
+### Removed
+- Unused `useCalls` and `useSMS` hooks and `RefreshContext` (not referenced anywhere).
+
 ## [1.1.3] - 2026-11-04
 
 ### Security

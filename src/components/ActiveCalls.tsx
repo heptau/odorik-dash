@@ -11,7 +11,9 @@ interface ActiveCallsProps {
 export default function ActiveCalls({ calls, onHangup, loading }: ActiveCallsProps) {
 	const t = useT();
 
-	if (loading) {
+	// Active calls are polled every few seconds; only show the placeholder before
+	// the first result, otherwise the list would flicker on every poll.
+	if (loading && calls.length === 0) {
 		return (
 			<div className="p-4 text-center" style={{ color: 'var(--text-tertiary)' }}>
 				{t('active_calls.loading')}

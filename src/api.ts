@@ -133,6 +133,8 @@ export const saveCredentials = async (creds: OdorikCredentials): Promise<void> =
 
 export const clearCredentials = (): void => {
   localStorage.removeItem(CREDENTIALS_KEY);
+  // The device key only exists to decrypt the credentials removed above.
+  localStorage.removeItem(DEVICE_KEY_STORAGE_KEY);
 };
 
 export const fetchContacts = async (creds: OdorikCredentials, options?: RetryOptions): Promise<Contact[]> => {
@@ -342,8 +344,9 @@ export const fetchCallsAndSMS = async (
 	url.searchParams.append('include_sms', 'true');
 
 	const response = await fetch(url.toString(), { method: 'GET' });
-	const data = await response.json();
-	if (data.errors) throw new Error(data.errors[0]);
+	const data = await response.json().catch(() => null);
+	if (data && data.errors) throw new Error(data.errors[0]);
+	if (!response.ok || !Array.isArray(data)) throw new Error('Failed to fetch activity');
 
 	const calls: OdorikCall[] = [];
 	const sms: OdorikSMS[] = [];
@@ -576,15 +579,12 @@ export const updateSimCard = async (
     for (const [key, value] of Object.entries(params)) {
       if (value !== undefined) urlParams.append(key, String(value));
     }
-    console.log('updateSimCard request:', `https://www.odorik.cz/api/v1/sim_cards/${phoneNumber}.json`, Object.fromEntries(urlParams));
     const response = await fetch(`https://www.odorik.cz/api/v1/sim_cards/${phoneNumber}.json`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: urlParams,
     });
-    console.log('updateSimCard response status:', response.status);
     const text = await response.text();
-    console.log('updateSimCard response:', text);
     if (!response.ok) throw new Error(text || `HTTP ${response.status}`);
     const data = text ? JSON.parse(text) : {};
     if (data && data.errors) throw new Error(data.errors.join(', '));
@@ -634,7 +634,8 @@ export const isValidBalance = (value: string): boolean => /^-?\d+(\.\d+)?$/.test
 
 export const fetchBalance = async (creds: OdorikCredentials, options?: RetryOptions): Promise<string> => {
   return withRetry(async () => {
-    const response = await fetch(`https://www.odorik.cz/api/v1/balance?user=${creds.user}&password=${creds.pass}`);
+    const params = new URLSearchParams({ user: creds.user, password: creds.pass });
+    const response = await fetch(`https://www.odorik.cz/api/v1/balance?${params.toString()}`);
     const text = (await response.text()).trim();
     if (!response.ok || !isValidBalance(text)) {
       throw new Error(text || 'Chyba při načítání kreditu');
@@ -727,7 +728,11 @@ function openDB(): Promise<IDBDatabase> {
 			}
 		};
 		request.onsuccess = () => resolve(request.result);
-		request.onerror = () => reject(request.error);
+		request.onerror = () => {
+			// Don't keep a rejected promise around, so the next call can retry.
+			dbPromise = null;
+			reject(request.error);
+		};
 	});
 	return dbPromise;
 }
@@ -911,10 +916,15 @@ export const getLinesCacheKey = (creds: OdorikCredentials): string =>
 export const getSimCardsCacheKey = (creds: OdorikCredentials): string =>
 	`odorik_simcards_${creds.user}`;
 
+// localStorage keys that share the `odorik_` prefix but are not cached data:
+// clearing the cache must not log the user out or reset their language.
+const PERSISTENT_STORAGE_KEYS = [CREDENTIALS_KEY, DEVICE_KEY_STORAGE_KEY, 'odorik_locale'];
+
 /**
- * Remove all odorik data from IndexedDB cache.
+ * Remove all cached odorik data (IndexedDB + legacy localStorage cache).
  * Call this on logout or when a different user logs in so stale data
- * from the previous session is never shown.
+ * from the previous session is never shown. Credentials are not touched —
+ * use clearCredentials() for that.
  */
 export const clearAllCaches = async (): Promise<void> => {
 	// Clear IndexedDB cache
@@ -936,7 +946,7 @@ export const clearAllCaches = async (): Promise<void> => {
 		const keys: string[] = [];
 		for (let i = 0; i < localStorage.length; i++) {
 			const key = localStorage.key(i);
-			if (key && key.startsWith('odorik_')) {
+			if (key && key.startsWith('odorik_') && !PERSISTENT_STORAGE_KEYS.includes(key)) {
 				keys.push(key);
 			}
 		}

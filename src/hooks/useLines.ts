@@ -11,7 +11,10 @@ export function useLines(creds: OdorikCredentials | null) {
 
 	const load = useCallback(async (showSpinner = true) => {
 		if (!creds) return;
-		if (isOffline()) return;
+		if (isOffline()) {
+			setLoading(false);
+			return;
+		}
 
 		if (showSpinner) setLoading(true);
 		setError(null);

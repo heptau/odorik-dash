@@ -339,7 +339,10 @@ export default function Lines({ creds }: { creds: OdorikCredentials }) {
 	const getLinesCacheKey = (creds: OdorikCredentials): string => `odorik_lines_sims_${creds.user}`;
 
 	const fetchAndCache = async (showSpinner = true) => {
-		if (isOffline()) return;
+		if (isOffline()) {
+			setLoading(false);
+			return;
+		}
 		if (showSpinner) setLoading(true);
 		setError('');
 		try {

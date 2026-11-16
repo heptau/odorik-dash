@@ -4,6 +4,14 @@ import type { OdorikCredentials, ActivityItem } from '../api';
 
 export type FilterType = 'all' | 'calls' | 'sms';
 
+// Calls and SMS come from separate ID sequences, so an ID alone is not unique
+// across the merged feed.
+function mergeActivity(...lists: ActivityItem[][]): ActivityItem[] {
+	const unique = new Map<string, ActivityItem>();
+	for (const item of lists.flat()) unique.set(`${item.type}-${item.id}`, item);
+	return Array.from(unique.values()).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+
 export function useActivity(creds: OdorikCredentials | null) {
 	const [activity, setActivity] = useState<ActivityItem[]>([]);
 	const [loading, setLoading] = useState(false);
@@ -85,9 +93,7 @@ export function useActivity(creds: OdorikCredentials | null) {
 
 			const { activity: more } = await fetchCallsAndSMS(creds, fromDate.toISOString(), toDate.toISOString());
 			if (more.length > 0) {
-				const merged = [...activity, ...more];
-				const unique = Array.from(new Map(merged.map(item => [item.id, item])).values());
-				const sorted = unique.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+				const sorted = mergeActivity(activity, more);
 				setActivity(sorted);
 				if (cacheKey) saveToCache(cacheKey, sorted);
 			}
@@ -112,9 +118,7 @@ export function useActivity(creds: OdorikCredentials | null) {
 				const toDate = new Date().toISOString();
 				fetchCallsAndSMS(creds, fromDate, toDate).then(({ activity: act }) => {
 					if (act.length > 0) {
-						const merged = [...act, ...cached];
-						const unique = Array.from(new Map(merged.map(item => [item.id, item])).values());
-						const sorted = unique.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+						const sorted = mergeActivity(act, cached);
 						setActivity(sorted);
 						if (cacheKey) saveToCache(cacheKey, sorted);
 					}

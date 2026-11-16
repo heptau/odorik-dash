@@ -24,7 +24,7 @@ export default defineConfig(() => ({
         assetFileNames: 'assets/[name]-' + version + '.[ext]',
       },
       input: {
-        main: resolve(__dirname, 'index.html'),
+        main: resolve(import.meta.dirname, 'index.html'),
       },
     },
   },

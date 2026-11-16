@@ -44,10 +44,10 @@ export default function Settings({ onClearCache }: SettingsProps) {
 				
 				if (registration) {
 					await registration.update();
-					setTimeout(() => {
-						setUpdateStatus('up-to-date');
-						setUpdateInfo('PWA is active and up to date');
-					}, 1000);
+					// A newly found worker is installing/waiting right after update() resolves.
+					const hasUpdate = Boolean(registration.installing || registration.waiting);
+					setUpdateInfo('');
+					setUpdateStatus(hasUpdate ? 'available' : 'up-to-date');
 				} else {
 					setUpdateStatus('no-sw');
 					setUpdateInfo('PWA not installed');

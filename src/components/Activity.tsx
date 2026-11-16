@@ -25,7 +25,7 @@ export default function Activity({ activity, loading, loadingMore, error, select
 	const [search, setSearch] = useState('');
 	const [selectedItem, setSelectedItem] = useState<ActivityItem | null>(null);
 	const t = useT();
-	const { locale } = useI18n();
+	const { activeLocale: locale } = useI18n();
 
 	const translate = (str: string) => {
 		const map: Record<string, Record<string, string>> = {
@@ -57,7 +57,7 @@ export default function Activity({ activity, loading, loadingMore, error, select
 	const formatPriceDetail = (price: string | number | undefined) => formatPrice(price, false);
 
 	function CallDetail({ item, lines, translate, t, balance }: { item: ActivityItem & { type: 'call' }; lines: OdorikLine[]; translate: (str: string) => string; t: (key: string) => string; balance?: { amount: string; currency: string } }) {
-		const { locale } = useI18n();
+		const { activeLocale: locale } = useI18n();
 		const c = item as unknown as { direction?: string; status?: string; destination_name?: string; length?: number; price?: string };
 		const isMissed = c.status === 'missed';
 		const isInbound = c.direction === 'in';
@@ -146,7 +146,7 @@ export default function Activity({ activity, loading, loadingMore, error, select
 	}
 
 	function SmsDetail({ item, lines, t, balance }: { item: ActivityItem & { type: 'sms' }; lines: OdorikLine[]; t: (key: string) => string; balance?: { amount: string; currency: string } }) {
-		const { locale } = useI18n();
+		const { activeLocale: locale } = useI18n();
 		const s = item as unknown as { price?: string };
 
 		const srcMatch = lookupContactOrLine(item.source_number, contacts, lines);
@@ -197,8 +197,8 @@ export default function Activity({ activity, loading, loadingMore, error, select
 					</div>
 				</div>
 
-				<DetailRowMulti label="Od" topValue={unifyPhoneNo(item.source_number) || '-'} bottomValue={srcMatch?.type === 'contact' ? srcMatch.contact.name : undefined} />
-				<DetailRowMulti label="Na" topValue={unifyPhoneNo(item.destination_number) || '-'} bottomValue={dstMatch?.type === 'contact' ? dstMatch.contact.name : undefined} />
+				<DetailRowMulti label={t('calls.from')} topValue={unifyPhoneNo(item.source_number) || '-'} bottomValue={srcMatch?.type === 'contact' ? srcMatch.contact.name : undefined} />
+				<DetailRowMulti label={t('calls.to')} topValue={unifyPhoneNo(item.destination_number) || '-'} bottomValue={dstMatch?.type === 'contact' ? dstMatch.contact.name : undefined} />
 
 				<DetailRowMulti label={t('calls.line')} topValue={lineInfo.name} bottomValue={lineInfo.id} />
 

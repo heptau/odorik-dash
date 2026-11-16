@@ -35,6 +35,8 @@ self.addEventListener('message', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+
   const url = new URL(event.request.url);
 
   if (url.pathname.startsWith('/locales/')) {
@@ -74,10 +76,4 @@ self.addEventListener('fetch', (event) => {
       });
     })
   );
-});
-
-self.addEventListener('controllerchange', (event) => {
-  if (event.controller) {
-    window.location.reload();
-  }
 });

@@ -9,7 +9,7 @@ Odorik Dash is a modernization of the original PWA app. Built on React 19 + Type
 ## Technology Stack
 - **Frontend**: React 19, TypeScript 5.9, Tailwind CSS 4
 - **Build**: Vite 8
-- **Testing**: Vitest + @testing-library/react + jsdom (32 tests)
+- **Testing**: Vitest + @testing-library/react + jsdom
 - **Code Quality**: ESLint + TypeScript strict mode
 - **APIs**: Odorik.cz REST API (documentation in openapi.yaml)
 - **PWA**: Service Worker + Web App Manifest (offline support)
@@ -19,7 +19,7 @@ Odorik Dash is a modernization of the original PWA app. Built on React 19 + Type
 src/
 ├── components/        # React components (Contacts, Activity, Callback, SendSms, ...)
 ├── hooks/             # Custom React hooks (useBalance, useContacts, useActivity, ...)
-├── i18n/              # Internationalization (11 languages)
+├── i18n/              # Internationalization (11 languages; context.ts, I18nProvider.tsx, index.ts)
 │   └── locales/       # EDIT LOCALIZATIONS HERE (cs, en, de, es, fr, it, pl, pt, sk, uk, vi)
 ├── pwa/               # PWA files (manifest, icon, service worker)
 ├── test/              # Test setup
@@ -133,16 +133,29 @@ clearAllCaches(): Promise<void>                   // Clear all cache
 ## Important Implementation Details
 
 ### Logout
-- Button in Settings → "Odhlásit se"
+- Button in the desktop sidebar / mobile "More" menu
 - Cache clearing: `clearAllCaches()` (IndexedDB + localStorage)
 - Credentials clearing: `clearCredentials()`
 - Page reload: `window.location.reload()`
 
 ### Settings Component
 ```typescript
-<Settings onLogout={handleLogout} />
+<Settings onClearCache={handleClearCache} />
 ```
-Accepts `onLogout` prop for logout handler.
+Accepts `onClearCache` (calls `clearAllCaches()`). Logout lives in the desktop sidebar and the
+mobile "More" menu, not in Settings.
+
+### `odorik_` localStorage keys
+`clearAllCaches()` removes every `odorik_*` localStorage key **except** `odorik_credentials`,
+`odorik_device_key` and `odorik_locale` (see `PERSISTENT_STORAGE_KEYS` in `api.ts`), so clearing the
+cache never logs the user out. `clearCredentials()` removes the credentials and the device key.
+
+### i18n module layout
+- `src/i18n/context.ts` - context, `useI18n`, `useT`, locale list/detection (no components)
+- `src/i18n/I18nProvider.tsx` - the provider component only (keeps React Fast Refresh working)
+- `src/i18n/index.ts` - re-exports; import from `'../i18n'`
+- `locale` from `useI18n()` can be `'auto'`; use `activeLocale` whenever a real language code is
+  needed (`Intl`, `toLocaleDateString`, lookup tables)
 
 ### Background Sync in useActivity
 When loading from cache, new data is synced from the last cached item:

@@ -11,6 +11,14 @@ function isAuthError(message: string): boolean {
 
 const getContactsCacheKey = (creds: OdorikCredentials) => `contacts_${creds.user}`;
 
+// Older versions stored the contacts wrapped once more as `{ data, timestamp }`;
+// accept both shapes so such entries don't end up in state as a non-array.
+function unwrapCachedContacts(data: unknown): Contact[] | null {
+	if (Array.isArray(data)) return data as Contact[];
+	const inner = (data as { data?: unknown } | null)?.data;
+	return Array.isArray(inner) ? (inner as Contact[]) : null;
+}
+
 export function useContacts(creds: OdorikCredentials | null, onAuthError?: () => void) {
 	const [contacts, setContacts] = useState<Contact[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -25,17 +33,18 @@ export function useContacts(creds: OdorikCredentials | null, onAuthError?: () =>
 		const cacheKey = getContactsCacheKey(creds);
 		
 		try {
-			const cached = await readCache<Contact[]>(cacheKey);
+			const cached = await readCache<unknown>(cacheKey);
+			const cachedContacts = cached ? unwrapCachedContacts(cached.data) : null;
 			
 			// Use cache if valid and not forcing refresh
-			if (cached && !isCacheStale(cached, getCacheTTL('contacts'))) {
-				setContacts(cached.data);
+			if (cached && cachedContacts && !isCacheStale(cached, getCacheTTL('contacts'))) {
+				setContacts(cachedContacts);
 				setLoading(false);
 				
 				// Background refresh if online
 				if (!isOffline()) {
 					fetchContacts(creds).then(data => {
-						writeCache(cacheKey, { data, timestamp: Date.now() });
+						writeCache(cacheKey, data);
 						setContacts(data);
 					}).catch(() => {});
 				}
@@ -44,13 +53,14 @@ export function useContacts(creds: OdorikCredentials | null, onAuthError?: () =>
 			
 			// Fetch fresh data
 			const data = await fetchContacts(creds);
-			await writeCache(cacheKey, { data, timestamp: Date.now() });
+			await writeCache(cacheKey, data);
 			setContacts(data);
 		} catch (err) {
 			// Try to use stale cache on error
-			const cached = await readCache<Contact[]>(cacheKey);
-			if (cached?.data) {
-				setContacts(cached.data);
+			const cached = await readCache<unknown>(cacheKey);
+			const cachedContacts = cached ? unwrapCachedContacts(cached.data) : null;
+			if (cachedContacts) {
+				setContacts(cachedContacts);
 			} else {
 				const message = err instanceof Error ? err.message : 'Failed to load contacts';
 				setError(message);
